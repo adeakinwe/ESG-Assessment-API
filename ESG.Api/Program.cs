@@ -1,4 +1,6 @@
 using ESG.Api.Data;
+using ESG.Api.Interface;
+using ESG.Api.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,13 +20,14 @@ else
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseInMemoryDatabase("InMem"));
 }
-
+builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
+builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+PrepDb.PrepPopulation(app, env.IsProduction());
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -32,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.Run();
 

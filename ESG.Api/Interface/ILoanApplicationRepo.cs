@@ -4,8 +4,8 @@ namespace ESG.Api.Interface
 {
     public interface ILoanApplicationRepo
     {
-        List<LoanApplicationForCreationDTO> GetAllLoanApplication();
-        LoanApplicationForCreationDTO GetLoanApplicationById(int id);
+        List<LoanApplicationForReturnDTO> GetAllLoanApplication();
+        LoanApplicationForReturnDTO GetLoanApplicationById(int id);
         bool CreateLoanApplication(LoanApplicationForCreationDTO model);
         bool UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication);
         bool DeleteLoanApplication(int id);

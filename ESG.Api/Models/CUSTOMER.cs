@@ -19,7 +19,7 @@ namespace ESG.Api.Models
         [MaxLength(10)]
         public string GENDER { get; set; }  = null!;
         [Required]
-        public string OCCUPATION { get; set; } = null!;
+        public int SECTOR { get; set; }
         [Required]
         public string ADDRESS { get; set; } = null!;
         [Required]

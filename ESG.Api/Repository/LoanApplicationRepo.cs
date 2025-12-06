@@ -7,7 +7,7 @@ namespace ESG.Api.Repository
 {
     public class LoanApplicationRepo : ILoanApplicationRepo
     {
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
         public LoanApplicationRepo(AppDbContext context)
         {
             _context = context;
@@ -15,17 +15,17 @@ namespace ESG.Api.Repository
         public bool CreateLoanApplication(LoanApplicationForCreationDTO model)
         {
             ArgumentNullException.ThrowIfNull(model);
-            
-            var loanApplication = new LOAN_APPLICATION {
+
+            var newLoanApplication = new LOAN_APPLICATION {
                 PRODUCTID = model.productId,
                 AMOUNT = model.amount,
-                TENORINDAYS = model.tenorInDays,
+                TENOR = model.tenorInDays,
                 INTERESTRATE = model.interestRate,
                 LOANPURPOSE = model.loanPurpose,
                 APPLICATIONDATE = DateTime.Now
             };
 
-            _context.LOAN_APPLICATION.Add(loanApplication);
+            _context.LOAN_APPLICATION.Add(newLoanApplication);
             return SaveChanges();
         }
 
@@ -43,24 +43,37 @@ namespace ESG.Api.Repository
             return output;
         }
 
-        public List<LoanApplicationForCreationDTO> GetAllLoanApplication()
+        public List<LoanApplicationForReturnDTO> GetAllLoanApplication()
         {
-            var loanApplications = _context.LOAN_APPLICATION.Select(x => new LoanApplicationForCreationDTO
+            var loanApplications = _context.LOAN_APPLICATION.Select(x => new LoanApplicationForReturnDTO
             {
-                
+                customerName = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.FIRSTNAME + " " + c.LASTNAME).FirstOrDefault() ?? "",
+                productName = x.PRODUCTID == 1 ? "Term Loan" : x.PRODUCTID == 2 ? "Overdraft" : "Others",
+                amount = x.AMOUNT,
+                tenorInDays = x.TENOR,
+                interestRate = x.INTERESTRATE,
+                loanPurpose = x.LOANPURPOSE,
+                applicationDate = x.APPLICATIONDATE
             }).ToList();
 
             return loanApplications;
         }
 
-        public LoanApplicationForCreationDTO GetLoanApplicationById(int id)
+        public LoanApplicationForReturnDTO GetLoanApplicationById(int id)
         {
-            var loanApplication = _context.LOAN_APPLICATION.Where(x => x.LOANAPPLICATIONID == id).Select(x => new LoanApplicationForCreationDTO
+            var loanApplication = _context.LOAN_APPLICATION.Where(x => x.LOANAPPLICATIONID == id).Select(x => new LoanApplicationForReturnDTO
             {
-                
+                customerName = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.FIRSTNAME + " " + c.LASTNAME).FirstOrDefault() ?? "",
+                productName = x.PRODUCTID == 1 ? "Term Loan" : x.PRODUCTID == 2 ? "Overdraft" : "Others",
+                amount = x.AMOUNT,
+                tenorInDays = x.TENOR,
+                interestRate = x.INTERESTRATE,
+                loanPurpose = x.LOANPURPOSE,
+                applicationDate = x.APPLICATIONDATE
+
             }).FirstOrDefault();
 
-            return loanApplication ?? new LoanApplicationForCreationDTO();
+            return loanApplication ?? new LoanApplicationForReturnDTO();
         }
 
         public bool SaveChanges()

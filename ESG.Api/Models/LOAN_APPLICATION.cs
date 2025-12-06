@@ -16,7 +16,7 @@ namespace ESG.Api.Models
         [Required]
         public double AMOUNT { get; set; }
         [Required]
-        public int TENORINDAYS { get; set; }
+        public int TENOR { get; set; }
         [Required]
         public decimal INTERESTRATE { get; set; }
         [Required]
