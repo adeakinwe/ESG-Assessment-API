@@ -8,10 +8,15 @@ namespace ESG.Api.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Required]
         public int CHECKLISTDETAILID { get; set; }
+        [Required]
         public int CHECKLISTITEMID { get; set; }
+        [Required]
         public bool RESPONSETYPEID { get; set; }
+        [Required]
         public int SCORE { get; set; }
+        [Required]
         public int WEIGHT { get; set; }
         public string COMMENT_ { get; set; } = null!;
         public int CREATEDBY { get; set; } = 1;

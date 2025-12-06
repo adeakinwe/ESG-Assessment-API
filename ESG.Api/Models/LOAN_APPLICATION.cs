@@ -9,13 +9,19 @@ namespace ESG.Api.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LOANAPPLICATIONID { get; set; }
+        [Required]
         public int CUSTOMERID { get; set; }
+        [Required]
         public int PRODUCTID { get; set; }
+        [Required]
         public double AMOUNT { get; set; }
+        [Required]
         public int TENORINDAYS { get; set; }
+        [Required]
         public decimal INTERESTRATE { get; set; }
+        [Required]
         public DateTime APPLICATIONDATE { get; set; }
-        public int CREATEDBY { get; set; }
-        public DateTime DATETIMECREATED { get; set; }
+        public int CREATEDBY { get; set; } = 1;
+        public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
     }
 }

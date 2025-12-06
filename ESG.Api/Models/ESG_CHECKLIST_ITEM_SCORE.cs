@@ -9,8 +9,11 @@ namespace ESG.Api.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SCOREID { get; set; }
+        [Required]
         public int CHECKLISTITEMID { get; set; }
+        [Required]
         public int RESPONSETYPEID { get; set; }
+        [Required]
         public int SCORE { get; set; }
     }
 }

@@ -9,10 +9,15 @@ namespace ESG.Api.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SUMMARYID { get; set; }
+        [Required]
         public int CHECKLISTITEMID { get; set; }
+        [Required]
         public int LOANAPPLICATIONID { get; set; }
+        [Required]
         public int TOTALSCORE { get; set; }
+        [Required]
         public int TOTALWEIGHT { get; set; }
+        [Required]
         public int RATINGID { get; set; }
         public string COMMENT_ { get; set; } = null!;
         public int CREATEDBY { get; set; } = 1;
