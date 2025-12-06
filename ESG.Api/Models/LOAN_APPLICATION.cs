@@ -20,6 +20,8 @@ namespace ESG.Api.Models
         [Required]
         public decimal INTERESTRATE { get; set; }
         [Required]
+        public string LOANPURPOSE { get; set; } = null!;
+        [Required]
         public DateTime APPLICATIONDATE { get; set; }
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
