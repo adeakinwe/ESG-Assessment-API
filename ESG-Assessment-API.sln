@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESG.Api", "ESG.Api\ESG.Api.csproj", "{9B495892-0F36-2D09-4E2B-392ECBA80F8A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B495892-0F36-2D09-4E2B-392ECBA80F8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B495892-0F36-2D09-4E2B-392ECBA80F8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B495892-0F36-2D09-4E2B-392ECBA80F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B495892-0F36-2D09-4E2B-392ECBA80F8A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7FD09E62-1249-46CE-82E3-8A0C7E9E616F}
+	EndGlobalSection
+EndGlobal
