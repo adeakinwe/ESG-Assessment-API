@@ -7,12 +7,37 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
 Console.WriteLine($"Current Environment: {env.EnvironmentName}");
 
+// Get MySQL password from environment variables (SECURE)
+string mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD") ?? "mysqluser10$";
+//string mysqlPassword = builder.Configuration["MYSQL_ROOT_PASSWORD"];
+Console.WriteLine($"Password: {mysqlPassword}");
+if (string.IsNullOrWhiteSpace(mysqlPassword))
+{
+    Console.WriteLine("Warning: MYSQL_ROOT_PASSWORD is not set. Ensure it is configured correctly.");
+}
+
+// Get database connection string
+string connectionString = builder.Configuration.GetConnectionString("Conn") ?? "";
+
+// Get current environment from configuration
+var currentEnv =  builder.Configuration["CurrentEnvironment"];
+Console.WriteLine($"Current Environment from Config: {currentEnv}");
+bool isProdEnv = currentEnv?.ToLower() == "production" ? true : false;
+
+//Inject MySQL password into connection string if it's missing
+if (!string.IsNullOrWhiteSpace(mysqlPassword) && connectionString.Contains("__MYSQL_ROOT_PASSWORD__"))
+{
+    connectionString = connectionString.Replace("__MYSQL_ROOT_PASSWORD__", mysqlPassword);
+}
+
+Console.WriteLine($"ConnectionString: {connectionString}");
+
 // Add services to the container.
-if (env.IsProduction())
+if (isProdEnv)
 {
     Console.WriteLine("Running in Production mode (Using MySQL)");
-    // builder.Services.AddDbContext<AppDbContext>(options =>
-    //     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 }
 else
 {
@@ -24,12 +49,22 @@ builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-PrepDb.PrepPopulation(app, env.IsProduction());
+PrepDb.PrepPopulation(app, isProdEnv);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -38,11 +73,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors();
 //app.UseHttpsRedirection();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -23,8 +23,8 @@ namespace ESG.Api.Models
         [Required]
         public string ADDRESS { get; set; } = null!;
         [Required]
-        public int CREATEDBY { get; set; }
+        public int CREATEDBY { get; set; } = 1;
         [Required]
-        public DateTime DATETIMECREATED { get; set; }
+        public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
     }
 }

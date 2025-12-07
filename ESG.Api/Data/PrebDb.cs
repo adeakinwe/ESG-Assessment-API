@@ -54,21 +54,23 @@ namespace ESG.Api.Data
                     return;
                 }
             }
-
-            if (!context.CUSTOMER.Any())
-            {
-                Console.WriteLine("Seeding customer data...");
-                context.CUSTOMER.AddRange(
-                    new CUSTOMER() { CUSTOMERCODE = "EA101", FIRSTNAME = "Martin", LASTNAME = "Levi", GENDER = "Male", SECTOR = 1, ADDRESS = "Lagos", CREATEDBY = 1, DATETIMECREATED = DateTime.Now },
-                    new CUSTOMER() { CUSTOMERCODE = "EA102", FIRSTNAME = "Matthias", LASTNAME = "Joy", GENDER = "Female", SECTOR = 2, ADDRESS = "Kano", CREATEDBY = 1, DATETIMECREATED = DateTime.Now }
-                );
-
-                context.SaveChanges();
-                Console.WriteLine("Customer data seeded successfully.");
-            }
             else
             {
-                Console.WriteLine("Customer data already exists. Skipping seeding.");
+                if (!context.CUSTOMER.Any())
+                {
+                    Console.WriteLine("Seeding customer data...");
+                    context.CUSTOMER.AddRange(
+                        new CUSTOMER() { CUSTOMERCODE = "EA101", FIRSTNAME = "Martin", LASTNAME = "Levi", GENDER = "Male", SECTOR = 1, ADDRESS = "Lagos", CREATEDBY = 1, DATETIMECREATED = DateTime.Now },
+                        new CUSTOMER() { CUSTOMERCODE = "EA102", FIRSTNAME = "Matthias", LASTNAME = "Joy", GENDER = "Female", SECTOR = 2, ADDRESS = "Kano", CREATEDBY = 1, DATETIMECREATED = DateTime.Now }
+                    );
+
+                    context.SaveChanges();
+                    Console.WriteLine("Customer data seeded successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Customer data already exists. Skipping seeding.");
+                }
             }
         }
     }

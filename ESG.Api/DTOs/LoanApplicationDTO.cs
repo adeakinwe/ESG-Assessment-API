@@ -11,6 +11,7 @@ namespace ESG.API.DTOs
         public DateTime applicationDate { get; set; }
         public int createdBy { get; set; }
         public DateTime dateTimeCreated { get; set; }
+        public int currencyId { get; set; }
     }
 
     public class LoanApplicationForReturnDTO
@@ -22,7 +23,6 @@ namespace ESG.API.DTOs
         public decimal interestRate { get; set; }
         public string loanPurpose { get; set; } = null!;
         public DateTime applicationDate { get; set; }
-        public int createdBy { get; set; }
-        public DateTime dateTimeCreated { get; set; }
+        public string currencyCode { get; set; } = null!;
     }
 }

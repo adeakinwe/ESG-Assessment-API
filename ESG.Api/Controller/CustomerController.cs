@@ -22,7 +22,7 @@ namespace ESG.Api.Controller
 
             if (customers != null)
             {
-               return Ok(customers) ; 
+                return Ok(customers);
             }
 
             return NotFound();
@@ -35,7 +35,7 @@ namespace ESG.Api.Controller
 
             if (customer != null)
             {
-               return Ok(customer) ; 
+                return Ok(customer);
             }
 
             return NotFound();
@@ -50,10 +50,26 @@ namespace ESG.Api.Controller
 
             if (status)
             {
-               return Ok() ; 
+                return Ok();
             }
 
             return NotFound();
+        }
+
+        // GET: api/customers?code=CUST001
+        [HttpGet("search")]
+        public ActionResult<IEnumerable<CustomerForReturnDTO>> GetCustomers([FromQuery] string param)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(param);
+                var customers = _repo.SearchCustomers(param);
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("An error occurred while processing your request: " + ex.Message);
+            }
         }
     }
 }

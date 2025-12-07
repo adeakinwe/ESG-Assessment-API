@@ -17,7 +17,8 @@ namespace ESG.Api.Repository
         {
             ArgumentNullException.ThrowIfNull(model);
 
-                var newCustomer = new CUSTOMER {
+            var newCustomer = new CUSTOMER
+            {
                 CUSTOMERCODE = model.customerCode,
                 FIRSTNAME = model.firstName,
                 LASTNAME = model.lastName,
@@ -58,6 +59,26 @@ namespace ESG.Api.Repository
             return customer ?? new CustomerForReturnDTO();
         }
 
+        public IEnumerable<CustomerForReturnDTO> SearchCustomers(string param)
+        {
+            if (string.IsNullOrWhiteSpace(param) || param.Length < 4)
+                return new List<CustomerForReturnDTO>();
+
+            return _context.CUSTOMER
+                .Where(c => c.CUSTOMERCODE.Contains(param) ||
+                            c.FIRSTNAME.Contains(param) ||
+                            c.LASTNAME.Contains(param))
+                .Select(c => new CustomerForReturnDTO
+                {
+                    customerId = c.CUSTOMERID,
+                    customerCode = c.CUSTOMERCODE,
+                    customerName = c.FIRSTNAME + " " + c.LASTNAME,
+                    sectorId = c.SECTOR,
+                    sectorName = c.SECTOR == 1 ? "Agriculture" : c.SECTOR == 2 ? "Oil and Gas" : "Others"
+                })
+                .OrderBy(c => c.customerName)
+                .ToList();
+        }
         public bool SaveChanges()
         {
             return _context.SaveChanges() >= 0;

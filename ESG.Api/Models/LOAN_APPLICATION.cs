@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ESG.Api.Models
 {
-    [Table("ESG_CHECKLIST_RESPONSE")]
+    [Table("LOAN_APPLICATION")]
     public partial class LOAN_APPLICATION
     {
         [Key]
@@ -21,6 +21,8 @@ namespace ESG.Api.Models
         public decimal INTERESTRATE { get; set; }
         [Required]
         public string LOANPURPOSE { get; set; } = null!;
+        [Required]
+        public int CURRENCYID { get; set; }
         [Required]
         public DateTime APPLICATIONDATE { get; set; }
         public int CREATEDBY { get; set; } = 1;

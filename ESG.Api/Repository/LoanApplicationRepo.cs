@@ -17,11 +17,13 @@ namespace ESG.Api.Repository
             ArgumentNullException.ThrowIfNull(model);
 
             var newLoanApplication = new LOAN_APPLICATION {
+                CUSTOMERID = model.customerId,
                 PRODUCTID = model.productId,
                 AMOUNT = model.amount,
                 TENOR = model.tenorInDays,
                 INTERESTRATE = model.interestRate,
                 LOANPURPOSE = model.loanPurpose,
+                CURRENCYID = model.currencyId,
                 APPLICATIONDATE = DateTime.Now
             };
 
@@ -53,6 +55,7 @@ namespace ESG.Api.Repository
                 tenorInDays = x.TENOR,
                 interestRate = x.INTERESTRATE,
                 loanPurpose = x.LOANPURPOSE,
+                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
                 applicationDate = x.APPLICATIONDATE
             }).ToList();
 
@@ -69,8 +72,8 @@ namespace ESG.Api.Repository
                 tenorInDays = x.TENOR,
                 interestRate = x.INTERESTRATE,
                 loanPurpose = x.LOANPURPOSE,
+                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
                 applicationDate = x.APPLICATIONDATE
-
             }).FirstOrDefault();
 
             return loanApplication ?? new LoanApplicationForReturnDTO();
