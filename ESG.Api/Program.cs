@@ -21,7 +21,9 @@ else
         options.UseInMemoryDatabase("InMem"));
 }
 builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
-builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
+builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
+
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,7 +36,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseAuthorization();
+app.MapControllers();
 //app.UseHttpsRedirection();
 
 app.Run();

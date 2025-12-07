@@ -35,7 +35,7 @@ namespace ESG.Api.Repository
             var customers = _context.CUSTOMER.Select(x => new CustomerForReturnDTO
             {
                 customerCode = x.CUSTOMERCODE,
-                firstName = x.FIRSTNAME + " " + x.LASTNAME,
+                customerName = x.FIRSTNAME + " " + x.LASTNAME,
                 gender = x.GENDER,
                 sectorName = x.SECTOR == 1 ? "Agriculture" : x.SECTOR == 2 ? "Oil and Gas" : "Others",
                 address = x.ADDRESS
@@ -49,7 +49,7 @@ namespace ESG.Api.Repository
             var customer = _context.CUSTOMER.Where(x => x.CUSTOMERID == id).Select(x => new CustomerForReturnDTO
             {
                 customerCode = x.CUSTOMERCODE,
-                firstName = x.FIRSTNAME + " " + x.LASTNAME,
+                customerName = x.FIRSTNAME + " " + x.LASTNAME,
                 gender = x.GENDER,
                 sectorName = x.SECTOR == 1 ? "Agriculture" : x.SECTOR == 2 ? "Oil and Gas" : "Others",
                 address = x.ADDRESS

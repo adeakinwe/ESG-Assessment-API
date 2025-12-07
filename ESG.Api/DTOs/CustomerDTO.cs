@@ -16,8 +16,7 @@ namespace ESG.API.DTOs
     public class CustomerForReturnDTO
     {
         public string customerCode { get; set; } = null!;
-        public string firstName { get; set; } = null!;
-        public string lastname { get; set; } = null!;
+        public string customerName { get; set; } = null!;
         public string gender { get; set; } = null!;
         public string sectorName { get; set; } = null!;
         public string address { get; set; } = null!;
