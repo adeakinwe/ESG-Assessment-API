@@ -13,7 +13,9 @@ namespace ESG.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20251207144528_currencymigration")]
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     partial class currencymigration
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

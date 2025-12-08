@@ -16,6 +16,7 @@ namespace ESG.API.DTOs
 
     public class LoanApplicationForReturnDTO
     {
+        public int loanApplicationId { get; set; }
         public string customerName { get; set; } = null!;
         public string productName { get; set; } = null!;
         public double amount { get; set; }
@@ -24,5 +25,6 @@ namespace ESG.API.DTOs
         public string loanPurpose { get; set; } = null!;
         public DateTime applicationDate { get; set; }
         public string currencyCode { get; set; } = null!;
+        public string sectorName { get; set; } = null!;
     }
 }

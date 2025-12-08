@@ -52,7 +52,8 @@ namespace ESG.Api.Repository
                 customerCode = x.CUSTOMERCODE,
                 customerName = x.FIRSTNAME + " " + x.LASTNAME,
                 gender = x.GENDER,
-                sectorName = x.SECTOR == 1 ? "Agriculture" : x.SECTOR == 2 ? "Oil and Gas" : "Others",
+                sectorName = x.SECTOR == 1 ? "Agriculture" : x.SECTOR == 2 ? "Manufacturing" : x.SECTOR == 3 ? "Services" : 
+                x.SECTOR == 4 ? "Trade" : x.SECTOR == 5 ? "Oil and Gas": "Others",
                 address = x.ADDRESS
             }).FirstOrDefault();
 
