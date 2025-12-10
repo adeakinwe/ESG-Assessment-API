@@ -12,6 +12,8 @@ namespace ESG.Api.Models
         [Required]
         public string CHECKLISTITEM { get; set; } = null!;
         [Required]
+        public string CATEGORY { get; set; } = null!;
+        [Required]
         public int RESPONSETYPEID { get; set; }
         [Required]
         public bool ISINUSE { get; set; }

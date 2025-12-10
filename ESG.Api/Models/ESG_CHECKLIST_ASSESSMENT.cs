@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ESG.Api.Models
 {
-    [Table("ESG_CHECKLIST_DETAIL")]
-    public partial class ESG_CHECKLIST_DETAIL
+    [Table("ESG_CHECKLIST_ASSESSMENT")]
+    public partial class ESG_CHECKLIST_ASSESSMENT
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,6 +23,5 @@ namespace ESG.Api.Models
         public string COMMENT_ { get; set; } = null!;
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
-        //public virtual EsgChecklist Checklist { get; set; } = null!;
     }
 }
