@@ -10,6 +10,6 @@ namespace ESG.Api.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RESPONSETYPEID { get; set; }
         [Required]
-        public int NAME { get; set; }
+        public string NAME { get; set; } = null!;
     }
 }

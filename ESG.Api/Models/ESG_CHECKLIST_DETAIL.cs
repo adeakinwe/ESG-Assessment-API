@@ -13,6 +13,8 @@ namespace ESG.Api.Models
         [Required]
         public int CHECKLISTITEMID { get; set; }
         [Required]
+        public int LOANAPPLICATIONID { get; set; }
+        [Required]
         public bool RESPONSETYPEID { get; set; }
         [Required]
         public int SCORE { get; set; }
