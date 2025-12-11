@@ -4,6 +4,7 @@ using ESG.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ESG.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251210214451_indicatormigration")]
+    partial class indicatormigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace ESG.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("ESG.Api.Models.APPROVAL_STATUS", b =>
-                {
-                    b.Property<int>("APPROVALSTATUSID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("APPROVALSTATUSID"));
-
-                    b.Property<string>("NAME")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("APPROVALSTATUSID");
-
-                    b.ToTable("APPROVAL_STATUS");
-                });
 
             modelBuilder.Entity("ESG.Api.Models.CUSTOMER", b =>
                 {
@@ -168,9 +154,6 @@ namespace ESG.Api.Migrations
                     b.Property<int>("RESPONSETYPEID")
                         .HasColumnType("int");
 
-                    b.Property<int>("RESPONSETYPEVALUE")
-                        .HasColumnType("int");
-
                     b.Property<int>("SCORE")
                         .HasColumnType("int");
 
@@ -209,9 +192,6 @@ namespace ESG.Api.Migrations
 
                     b.Property<DateTime>("APPLICATIONDATE")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<int>("APPROVALSTATUSID")
-                        .HasColumnType("int");
 
                     b.Property<int>("CREATEDBY")
                         .HasColumnType("int");

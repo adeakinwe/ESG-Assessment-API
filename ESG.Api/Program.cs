@@ -47,6 +47,7 @@ else
 }
 builder.Services.AddScoped<ILoanApplicationRepo, LoanApplicationRepo>();
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
+builder.Services.AddScoped<IChecklistRepo, ChecklistRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

@@ -15,5 +15,6 @@ namespace ESG.Api.Data
         public DbSet<ESG_CHECKLIST_ITEM_SCORE> ESG_CHECKLIST_ITEM_SCORE { get; set; }
         public DbSet<LOAN_APPLICATION> LOAN_APPLICATION { get; set; }
         public DbSet<ESG_CHECKLIST_ASSESSMENT> ESG_CHECKLIST_ASSESSMENT { get; set; }
+        public DbSet<APPROVAL_STATUS> APPROVAL_STATUS { get; set; }
     }
 }

@@ -26,5 +26,7 @@ namespace ESG.API.DTOs
         public DateTime applicationDate { get; set; }
         public string currencyCode { get; set; } = null!;
         public string sectorName { get; set; } = null!;
+        public int approvalStatusId { get; set; }
+        public required string statusName { get; set; }
     }
 }

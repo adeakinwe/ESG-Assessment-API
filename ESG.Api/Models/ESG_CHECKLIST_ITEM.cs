@@ -6,7 +6,8 @@ namespace ESG.Api.Models
 {
     [Table("ESG_CHECKLIST_ITEM")]
     public partial class ESG_CHECKLIST_ITEM
-    {   [Key]
+    {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CHECKLISTITEMID { get; set; }
         [Required]
@@ -19,6 +20,6 @@ namespace ESG.Api.Models
         public bool ISINUSE { get; set; }
         [Required]
         public int WEIGHT { get; set; }
-        //public virtual EsgChecklist Checklist { get; set; } = null!;
+        public string INDICATORTYPE { get; set; } = null!;
     }
 }

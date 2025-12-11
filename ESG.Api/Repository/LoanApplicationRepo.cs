@@ -24,6 +24,7 @@ namespace ESG.Api.Repository
                 INTERESTRATE = model.interestRate,
                 LOANPURPOSE = model.loanPurpose,
                 CURRENCYID = model.currencyId,
+                APPROVALSTATUSID = 0, // Pending
                 APPLICATIONDATE = DateTime.Now
             };
 
@@ -62,7 +63,9 @@ namespace ESG.Api.Repository
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 4 ? "Trade" :
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 5 ? "Oil and Gas" : "Others",
                 currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
-                applicationDate = x.APPLICATIONDATE
+                applicationDate = x.APPLICATIONDATE,
+                approvalStatusId = x.APPROVALSTATUSID,
+                statusName = _context.APPROVAL_STATUS.Where(a => a.APPROVALSTATUSID == x.APPROVALSTATUSID).Select(a => a.NAME).FirstOrDefault() ?? "Pending"
             }).ToList();
 
             return loanApplications;
@@ -79,10 +82,16 @@ namespace ESG.Api.Repository
                 interestRate = x.INTERESTRATE,
                 loanPurpose = x.LOANPURPOSE,
                 currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
-                applicationDate = x.APPLICATIONDATE
+                applicationDate = x.APPLICATIONDATE,
+                approvalStatusId = x.APPROVALSTATUSID,
+                statusName = _context.APPROVAL_STATUS.Where(a => a.APPROVALSTATUSID == x.APPROVALSTATUSID).Select(a => a.NAME).FirstOrDefault() ?? "Pending",
+                loanApplicationId = x.LOANAPPLICATIONID,
+                sectorName = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 1 ? "Agriculture" :
+                             _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 2 ? "Manufacturing" :
+                             _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 3 ? "Services" : "Others"       
             }).FirstOrDefault();
 
-            return loanApplication ?? new LoanApplicationForReturnDTO();
+            return loanApplication!;
         }
 
         public bool SaveChanges()

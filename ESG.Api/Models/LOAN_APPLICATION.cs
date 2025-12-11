@@ -23,6 +23,7 @@ namespace ESG.Api.Models
         public string LOANPURPOSE { get; set; } = null!;
         [Required]
         public int CURRENCYID { get; set; }
+        public int APPROVALSTATUSID { get; set; }
         [Required]
         public DateTime APPLICATIONDATE { get; set; }
         public int CREATEDBY { get; set; } = 1;

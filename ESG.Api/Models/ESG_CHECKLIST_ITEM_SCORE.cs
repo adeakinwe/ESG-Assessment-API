@@ -14,6 +14,8 @@ namespace ESG.Api.Models
         [Required]
         public int RESPONSETYPEID { get; set; }
         [Required]
+        public int RESPONSETYPEVALUE { get; set; }
+        [Required]
         public int SCORE { get; set; }
     }
 }
