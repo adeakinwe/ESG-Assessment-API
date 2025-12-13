@@ -1,6 +1,8 @@
 using ESG.Api.Data;
+using ESG.Api.DTos;
 using ESG.Api.DTOs;
 using ESG.Api.Interface;
+using ESG.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESG.Api.Repository
@@ -42,6 +44,33 @@ namespace ESG.Api.Repository
                 .ToListAsync();
 
             return items;
+        }
+
+        public async Task<bool> IsLoanExistsAsync(int loanApplicationId)
+        {
+            return await _context.ESG_CHECKLIST_ASSESSMENT
+                .AnyAsync(x => x.LOANAPPLICATIONID == loanApplicationId);
+        }
+
+        public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
+        {
+            // Prevent duplicate assessment
+            if (await IsLoanExistsAsync(dto.LoanApplicationId))
+                throw new Exception(
+                    "ESG assessment already submitted for this loan");
+
+            var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
+            {
+                CHECKLISTITEMID = i.ChecklistItemId,
+                LOANAPPLICATIONID = dto.LoanApplicationId,
+                RESPONSETYPEID = i.ResponseTypeId,
+                SCORE = i.Score,
+                WEIGHT = i.Weight,
+                COMMENT_ = i.Comment ?? string.Empty
+            });
+
+            _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
+            await _context.SaveChangesAsync();
         }
     }
 }

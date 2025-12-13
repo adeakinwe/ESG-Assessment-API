@@ -15,7 +15,7 @@ namespace ESG.Api.Models
         [Required]
         public int LOANAPPLICATIONID { get; set; }
         [Required]
-        public bool RESPONSETYPEID { get; set; }
+        public int RESPONSETYPEID { get; set; }
         [Required]
         public int SCORE { get; set; }
         [Required]
