@@ -3,6 +3,7 @@ namespace ESG.Api.DTos
     public class EsgChecklistSubmissionDto
     {
         public int LoanApplicationId { get; set; }
+        public string Comment { get; set; } = null!;
         public List<EsgChecklistResponseDto> Items { get; set; } = [];
     }
 

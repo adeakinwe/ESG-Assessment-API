@@ -28,5 +28,7 @@ namespace ESG.API.DTOs
         public string sectorName { get; set; } = null!;
         public int approvalStatusId { get; set; }
         public required string statusName { get; set; }
+        public int riskRatingId { get; set; }
+        public required string riskRating { get; set; }
     }
 }

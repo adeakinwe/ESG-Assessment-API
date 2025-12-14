@@ -50,28 +50,6 @@ namespace ESG.Api.Repository
                 .AnyAsync(x => x.LOANAPPLICATIONID == loanApplicationId);
         }
 
-        // public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
-        // {
-        //     // Prevent duplicate assessment
-        //     if (await IsLoanExistsAsync(dto.LoanApplicationId))
-        //     {
-        //         await RemoveChecklistAssessmentAsync(dto.LoanApplicationId);
-        //     }
-
-        //     var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
-        //     {
-        //         CHECKLISTITEMID = i.ChecklistItemId,
-        //         LOANAPPLICATIONID = dto.LoanApplicationId,
-        //         RESPONSETYPEID = i.ResponseTypeId,
-        //         SCORE = i.Score,
-        //         WEIGHT = i.Weight,
-        //         COMMENT_ = i.Comment ?? string.Empty
-        //     });
-
-        //     _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
-        //     await _context.SaveChangesAsync();
-        // }
-
         public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
         {
             // Prevent duplicate assessment
@@ -117,7 +95,7 @@ namespace ESG.Api.Repository
                 TOTALWEIGHT = totalWeight,
                 AVGSCORE = averageScore,
                 RATINGID = ratingId,
-                COMMENT_ = null // Optional: populate later if needed
+                COMMENT_ = dto.Comment
             };
 
             _context.ESG_CHECKLIST_SUMMARY.Add(summary);
