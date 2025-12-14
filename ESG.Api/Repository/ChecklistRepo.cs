@@ -50,14 +50,45 @@ namespace ESG.Api.Repository
                 .AnyAsync(x => x.LOANAPPLICATIONID == loanApplicationId);
         }
 
+        // public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
+        // {
+        //     // Prevent duplicate assessment
+        //     if (await IsLoanExistsAsync(dto.LoanApplicationId))
+        //     {
+        //         await RemoveChecklistAssessmentAsync(dto.LoanApplicationId);
+        //     }
+
+        //     var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
+        //     {
+        //         CHECKLISTITEMID = i.ChecklistItemId,
+        //         LOANAPPLICATIONID = dto.LoanApplicationId,
+        //         RESPONSETYPEID = i.ResponseTypeId,
+        //         SCORE = i.Score,
+        //         WEIGHT = i.Weight,
+        //         COMMENT_ = i.Comment ?? string.Empty
+        //     });
+
+        //     _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
+        //     await _context.SaveChangesAsync();
+        // }
+
         public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
         {
             // Prevent duplicate assessment
             if (await IsLoanExistsAsync(dto.LoanApplicationId))
             {
                 await RemoveChecklistAssessmentAsync(dto.LoanApplicationId);
+                // Also remove existing summary if needed
+                var existingSummary = await _context.ESG_CHECKLIST_SUMMARY
+                    .Where(s => s.LOANAPPLICATIONID == dto.LoanApplicationId)
+                    .FirstOrDefaultAsync();
+                if (existingSummary != null)
+                {
+                    _context.ESG_CHECKLIST_SUMMARY.Remove(existingSummary);
+                }
             }
 
+            // 1️⃣ Save individual checklist assessments
             var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
             {
                 CHECKLISTITEMID = i.ChecklistItemId,
@@ -69,6 +100,29 @@ namespace ESG.Api.Repository
             });
 
             _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
+
+            // 2️⃣ Calculate summary
+            double totalScore = dto.Items.Sum(i => i.Score * i.Weight);
+            double totalWeight = dto.Items.Sum(i => i.Weight * 10);
+            double averageScore = totalWeight > 0 ? Math.Round(totalScore / totalWeight * 100, 2) : 0;
+
+            int ratingId = averageScore >= 65 ? 3  // High
+                          : averageScore >= 35 && averageScore < 65 ? 2 // Medium
+                          : 1;                     // Low
+
+            var summary = new ESG_CHECKLIST_SUMMARY
+            {
+                LOANAPPLICATIONID = dto.LoanApplicationId,
+                TOTALSCORE = totalScore,
+                TOTALWEIGHT = totalWeight,
+                AVGSCORE = averageScore,
+                RATINGID = ratingId,
+                COMMENT_ = null // Optional: populate later if needed
+            };
+
+            _context.ESG_CHECKLIST_SUMMARY.Add(summary);
+
+            // 3️⃣ Save all changes in one transaction
             await _context.SaveChangesAsync();
         }
 
@@ -113,6 +167,33 @@ namespace ESG.Api.Repository
             }
 
             return false;
+        }
+
+        public async Task<EsgChecklistSummaryDto> GetChecklistAssessmentSummaryByLoanIdAsync(int loanApplicationId)
+        {
+            var existingSummary = await _context.ESG_CHECKLIST_SUMMARY
+                    .Where(s => s.LOANAPPLICATIONID == loanApplicationId)
+                    .FirstOrDefaultAsync();
+
+            if (existingSummary != null)
+            {
+                var data = new EsgChecklistSummaryDto
+                {
+                    loanApplicationId = existingSummary.LOANAPPLICATIONID,
+                    ratingId = existingSummary.RATINGID,
+                    totalScore = existingSummary.TOTALSCORE,
+                    totalWeight = existingSummary.TOTALWEIGHT,
+                    averageScore = existingSummary.AVGSCORE,
+                    rating = existingSummary.RATINGID == 3 ? "High"
+                             : existingSummary.RATINGID == 2 ? "Medium"
+                             : "Low",
+                    comment = existingSummary.COMMENT_
+                };
+
+                return data;
+            }
+
+            return new EsgChecklistSummaryDto();
         }
     }
 }

@@ -46,7 +46,20 @@ namespace ESG.API.Controller
 
             if (assessment != null)
             {
-               return Ok(new { status = true, data = assessment }) ; 
+                return Ok(new { status = true, data = assessment });
+            }
+
+            return NotFound(new { status = false, message = "No record found" });
+        }
+
+        [HttpGet("checklist-summary/{loanApplicationId:int}")]
+        public async Task<IActionResult> GetChecklistAssessmentSummaryByLoanIdAsync(int loanApplicationId)
+        {
+            var existingSummary = await _repo.GetChecklistAssessmentSummaryByLoanIdAsync(loanApplicationId);
+
+            if (existingSummary != null)
+            {
+                return Ok(new { status = true, data = existingSummary });
             }
 
             return NotFound(new { status = false, message = "No record found" });

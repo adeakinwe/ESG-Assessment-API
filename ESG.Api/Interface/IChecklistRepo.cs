@@ -10,5 +10,6 @@ namespace ESG.Api.Interface
         Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto entity);
         Task<bool> RemoveChecklistAssessmentAsync(int loanApplicationId);
         Task<EsgChecklistSubmissionDto> GetChecklistAssessmentByLoanIdAsync(int loanApplicationId);
+        Task<EsgChecklistSummaryDto> GetChecklistAssessmentSummaryByLoanIdAsync(int loanApplicationId);
     }
 }

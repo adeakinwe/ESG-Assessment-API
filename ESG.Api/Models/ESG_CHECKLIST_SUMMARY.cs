@@ -12,12 +12,14 @@ namespace ESG.Api.Models
         [Required]
         public int LOANAPPLICATIONID { get; set; }
         [Required]
-        public int TOTALSCORE { get; set; }
+        public double TOTALSCORE { get; set; }
         [Required]
-        public int TOTALWEIGHT { get; set; }
+        public double TOTALWEIGHT { get; set; }
+        [Required]
+        public double AVGSCORE { get; set; }
         [Required]
         public int RATINGID { get; set; }
-        public string COMMENT_ { get; set; } = null!;
+        public string? COMMENT_ { get; set; }
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
     }
