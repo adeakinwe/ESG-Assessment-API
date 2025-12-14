@@ -18,8 +18,6 @@ namespace ESG.Api.Repository
         public async Task<List<ChecklistItemDto>> GetChecklistAsync()
         {
             var items = await _context.ESG_CHECKLIST_ITEM
-                //.Include(i => i.RESPONSETYPEID)
-                //.Include(i => i.ESG_CHECKLIST_SCORE)
                 .Select(item => new ChecklistItemDto
                 {
                     ChecklistItemId = item.CHECKLISTITEMID,
@@ -56,8 +54,9 @@ namespace ESG.Api.Repository
         {
             // Prevent duplicate assessment
             if (await IsLoanExistsAsync(dto.LoanApplicationId))
-                throw new Exception(
-                    "ESG assessment already submitted for this loan");
+            {
+                await RemoveChecklistAssessmentAsync(dto.LoanApplicationId);
+            }
 
             var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
             {
@@ -71,6 +70,49 @@ namespace ESG.Api.Repository
 
             _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<EsgChecklistSubmissionDto> GetChecklistAssessmentByLoanIdAsync(int loanApplicationId)
+        {
+            var assessments = await _context.ESG_CHECKLIST_ASSESSMENT
+                .Where(x => x.LOANAPPLICATIONID == loanApplicationId)
+                .ToListAsync();
+
+
+            if (assessments.Count > 0)
+            {
+                var data = new EsgChecklistSubmissionDto
+                {
+                    LoanApplicationId = loanApplicationId,
+                    Items = assessments.Select(a => new EsgChecklistResponseDto
+                    {
+                        ChecklistItemId = a.CHECKLISTITEMID,
+                        ResponseTypeId = a.RESPONSETYPEID,
+                        Score = a.SCORE,
+                        Weight = a.WEIGHT,
+                        Comment = a.COMMENT_
+                    }).ToList()
+                };
+
+                return data;
+            }
+
+            return new EsgChecklistSubmissionDto();
+        }
+
+        public async Task<bool> RemoveChecklistAssessmentAsync(int loanApplicationId)
+        {
+            var assessments = await _context.ESG_CHECKLIST_ASSESSMENT
+                .Where(x => x.LOANAPPLICATIONID == loanApplicationId)
+                .ToListAsync();
+
+            if (assessments.Count > 0)
+            {
+                _context.ESG_CHECKLIST_ASSESSMENT.RemoveRange(assessments);
+                return await _context.SaveChangesAsync() != 0;
+            }
+
+            return false;
         }
     }
 }

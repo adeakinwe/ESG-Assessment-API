@@ -23,7 +23,7 @@ namespace ESG.API.Controller
         }
 
         [HttpPost("submit-esg-assessment")]
-        public async Task<IActionResult> Submit([FromBody] EsgChecklistSubmissionDto dto)
+        public async Task<IActionResult> SubmitChecklistAssessmentAsync([FromBody] EsgChecklistSubmissionDto dto)
         {
             try
             {
@@ -37,6 +37,19 @@ namespace ESG.API.Controller
             {
                 return BadRequest(new { success = false, message = ex.Message });
             }
+        }
+
+        [HttpGet("loan-application/{loanApplicationId:int}")]
+        public async Task<IActionResult> GetChecklistAssessmentByLoanIdAsync(int loanApplicationId)
+        {
+            var assessment = await _repo.GetChecklistAssessmentByLoanIdAsync(loanApplicationId);
+
+            if (assessment != null)
+            {
+               return Ok(new { status = true, data = assessment }) ; 
+            }
+
+            return NotFound(new { status = false, message = "No record found" });
         }
     }
 }
