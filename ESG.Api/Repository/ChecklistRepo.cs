@@ -50,8 +50,18 @@ namespace ESG.Api.Repository
                 .AnyAsync(x => x.LOANAPPLICATIONID == loanApplicationId);
         }
 
+        private async Task<bool> IsLoanSubmittedForAppraisalAsync(int loanApplicationId)
+        {
+            return await _context.LOAN_APPLICATION
+                .AnyAsync(x => x.LOANAPPLICATIONID == loanApplicationId && x.SUBMITTEDFORAPPRAISAL == true);
+        }
+
         public async Task SubmitChecklistAssessmentAsync(EsgChecklistSubmissionDto dto)
         {
+            if (await IsLoanSubmittedForAppraisalAsync(dto.LoanApplicationId))
+            {
+                throw new InvalidOperationException("Cannot modify assessment for a loan application that has been submitted for appraisal.");
+            }
             // Prevent duplicate assessment
             if (await IsLoanExistsAsync(dto.LoanApplicationId))
             {

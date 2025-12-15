@@ -70,7 +70,8 @@ namespace ESG.Api.Repository
                 riskRatingId = _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault(),
                 riskRating = _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 3 ? "High"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
-                             : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated"
+                             : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
+                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false
             }).ToList();
 
             return loanApplications;
@@ -96,7 +97,8 @@ namespace ESG.Api.Repository
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 3 ? "Services" : "Others",
                 riskRating = _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 3 ? "High"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
-                             : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated"
+                             : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
+                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false
             }).FirstOrDefault();
 
             return loanApplication!;
