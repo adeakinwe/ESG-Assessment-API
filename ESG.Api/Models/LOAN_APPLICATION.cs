@@ -28,5 +28,6 @@ namespace ESG.Api.Models
         public DateTime APPLICATIONDATE { get; set; }
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
+        public bool? SUBMITTEDFORAPPRAISAL { get; set; }
     }
 }

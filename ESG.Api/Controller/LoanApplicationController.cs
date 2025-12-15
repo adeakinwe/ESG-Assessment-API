@@ -22,7 +22,7 @@ namespace ESG.Api.Controller
 
             if (loanApplications != null)
             {
-               return Ok(loanApplications) ; 
+                return Ok(loanApplications);
             }
 
             return NotFound();
@@ -35,10 +35,10 @@ namespace ESG.Api.Controller
 
             if (loanApplication != null)
             {
-               return Ok(loanApplication) ; 
+                return Ok(loanApplication);
             }
 
-            return NotFound(new { status = false, message="Loan Application not found" });
+            return NotFound(new { status = false, message = "Loan Application not found" });
         }
 
         [HttpPost("add")]
@@ -50,10 +50,31 @@ namespace ESG.Api.Controller
 
             if (status)
             {
-               return Ok() ; 
+                return Ok();
             }
 
-            return NotFound(new { status = false, message="Loan Application not added. Kindly contact Admin" });
+            return NotFound(new { status = false, message = "Loan Application not added. Kindly contact Admin" });
+        }
+
+        [HttpGet("submit-for-appraisal/{id:int}")]
+        public async Task<IActionResult> SubmitLoanApplicationForAppraisalAsync(int id)
+        {
+            try
+            {
+                bool result = await _repo.SubmitLoanApplicationForAppraisalAsync(id);
+                if (result)
+                {
+                    return Ok(new { success = true, message = "Loan application submitted for appraisal successfully." });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Failed to submit loan application for appraisal." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
     }
 }

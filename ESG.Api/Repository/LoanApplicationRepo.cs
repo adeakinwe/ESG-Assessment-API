@@ -2,6 +2,7 @@ using ESG.Api.Data;
 using ESG.Api.Interface;
 using ESG.Api.Models;
 using ESG.API.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace ESG.Api.Repository
 {
@@ -109,6 +110,20 @@ namespace ESG.Api.Repository
         public bool UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> SubmitLoanApplicationForAppraisalAsync(int id)
+        {
+            var loanApplication = await _context.LOAN_APPLICATION.Where(la => la.LOANAPPLICATIONID == id).FirstOrDefaultAsync();
+
+            if (loanApplication != null)
+            {
+                loanApplication.SUBMITTEDFORAPPRAISAL = true;
+                //_context.LOAN_APPLICATION.Update(loanApplication);
+                return await _context.SaveChangesAsync() != 0;
+            }
+
+            return false;
         }
     }
 }

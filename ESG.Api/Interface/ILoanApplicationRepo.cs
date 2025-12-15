@@ -10,5 +10,6 @@ namespace ESG.Api.Interface
         bool UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication);
         bool DeleteLoanApplication(int id);
         bool SaveChanges();
+        Task<bool> SubmitLoanApplicationForAppraisalAsync(int id);
     }
 }
