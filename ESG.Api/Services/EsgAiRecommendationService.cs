@@ -16,35 +16,69 @@ namespace ESG.Api.Services
             _repo = repo;
         }
 
+        private decimal ComputeConfidence(PreScreenRequest request)
+        {
+            decimal confidence = 0.60m;
+
+            if (request.sectorId == 2) confidence += 0.15m;
+
+            if (request.loanAmount > 500000000) confidence += 0.10m;
+
+            if (request.country == "NG") confidence += 0.05m;
+
+            return Math.Round(Math.Min(confidence, 0.95m), 2);
+        }
+
         public async Task<EsgAiRecommendationDTO> PreScreenAsync(PreScreenRequest request)
         {
             var riskLevelId = request.sectorId == 2
                 ? (int)EsgAiRiskLevelEnum.High
                 : (int)EsgAiRiskLevelEnum.Medium;
 
+            var recommendationText = riskLevelId == (int)EsgAiRiskLevelEnum.High
+                    ? "Enhanced Due Diligence And Mitigation Measures Required"
+                    : "Proceed With Conditions And Secondary Review";
+
+            var payload = JsonSerializer.Serialize(request);
+            decimal computedConfidence = ComputeConfidence(request);
+
             var recommendation = new EsgAiRecommendationDTO
             {
                 LoanApplicationId = request.loanApplicationId,
                 Stage = "PRE_SCREEN",
                 RiskLevel = (short)riskLevelId,
-                Recommendation = riskLevelId == (int)EsgAiRiskLevelEnum.High
-                    ? "Enhanced Due Diligence And Mitigation Measures Required"
-                    : "Proceed With Conditions And Secondary Review",
-                Confidence = 0.85m,
-                Payload = JsonSerializer.Serialize(request)
+                Recommendation = recommendationText,
+                Confidence = computedConfidence,
+                Payload = payload
             };
 
-            var preScreenRecommendation = new ESG_AI_RECOMMENDATION
+            var existingPrescreen = await _repo.GetLatestAsync(request.loanApplicationId, "PRE_SCREEN");
+            if (existingPrescreen != null)
             {
-                LOANAPPLICATIONID = recommendation.LoanApplicationId,
-                STAGE = "PRE_SCREEN",
-                RISKLEVEL = (short)recommendation.RiskLevel,
-                RECOMMENDATION = recommendation.Recommendation,
-                CONFIDENCE = recommendation.Confidence,
-                PAYLOAD = recommendation.Payload,
-            };
+                existingPrescreen.RISKLEVEL = recommendation.RiskLevel;
+                existingPrescreen.RECOMMENDATION = recommendation.Recommendation;
+                existingPrescreen.CONFIDENCE = recommendation.Confidence;
+                existingPrescreen.PAYLOAD = recommendation.Payload;
+                existingPrescreen.LASTUPDATEDBY = 1;
+                existingPrescreen.DATETIMEUPDATED = DateTime.Now;
 
-            await _repo.SaveAsync(preScreenRecommendation);
+                await _repo.UpdateAsync(existingPrescreen);
+            }
+            else
+            {
+                var preScreenRecommendation = new ESG_AI_RECOMMENDATION
+                {
+                    LOANAPPLICATIONID = recommendation.LoanApplicationId,
+                    STAGE = "PRE_SCREEN",
+                    RISKLEVEL = (short)recommendation.RiskLevel,
+                    RECOMMENDATION = recommendation.Recommendation,
+                    CONFIDENCE = recommendation.Confidence,
+                    PAYLOAD = recommendation.Payload,
+                };
+
+                await _repo.SaveAsync(preScreenRecommendation);
+            }
+            
             return recommendation;
         }
 

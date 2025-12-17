@@ -1,8 +1,6 @@
 using ESG.Api.Data;
-using ESG.Api.DTOs;
 using ESG.Api.Interface;
 using ESG.Api.Models;
-using ESGG.Api.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESG.Api.Repository
@@ -22,25 +20,31 @@ namespace ESG.Api.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<EsgAiRecommendationDTO?> GetLatestAsync(long loanApplicationId, string stage)
+        public async Task<ESG_AI_RECOMMENDATION?> GetLatestAsync(long loanApplicationId, string stage)
         {
             var recommendation = await _context.ESG_AI_RECOMMENDATION
                 .Where(x => x.LOANAPPLICATIONID == loanApplicationId && x.STAGE == stage)
-                .Select(x => new EsgAiRecommendationDTO
+                .Select(x => new ESG_AI_RECOMMENDATION
                 {
-                    Id = x.ID,
-                    LoanApplicationId = x.LOANAPPLICATIONID,
-                    Stage = x.STAGE,
-                    RiskLevel = x.RISKLEVEL,
-                    Recommendation = x.RECOMMENDATION,
-                    Confidence = x.CONFIDENCE,
-                    Payload = x.PAYLOAD,
-                    ModelVersion = x.MODELVERSION,
-                    CreatedBy = x.CREATEDBY,
-                    CreatedAt = x.DATETIMECREATED
-                }).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
+                    ID = x.ID,
+                    LOANAPPLICATIONID = x.LOANAPPLICATIONID,
+                    STAGE = x.STAGE,
+                    RISKLEVEL = x.RISKLEVEL,
+                    RECOMMENDATION = x.RECOMMENDATION,
+                    CONFIDENCE = x.CONFIDENCE,
+                    PAYLOAD = x.PAYLOAD,
+                    MODELVERSION = x.MODELVERSION,
+                    CREATEDBY = x.CREATEDBY,
+                    DATETIMECREATED = x.DATETIMECREATED
+                }).OrderByDescending(x => x.ID).FirstOrDefaultAsync();
 
             return recommendation;
+        }
+
+        public async Task UpdateAsync(ESG_AI_RECOMMENDATION recommendation)
+        {
+            _context.ESG_AI_RECOMMENDATION.Update(recommendation);
+            await _context.SaveChangesAsync();
         }
     }
 }

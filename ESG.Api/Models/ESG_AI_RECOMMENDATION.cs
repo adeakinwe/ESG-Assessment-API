@@ -18,5 +18,7 @@ namespace ESG.Api.Models
         public string MODELVERSION { get; set; } = "v1.0";
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
+        public int? LASTUPDATEDBY { get; set; }
+        public DateTime? DATETIMEUPDATED { get; set; }
     }
 }

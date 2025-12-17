@@ -6,6 +6,7 @@ namespace ESG.Api.Interface
     public interface IEsgAiRecommendationRepo
     {
         Task SaveAsync(ESG_AI_RECOMMENDATION recommendation);
-        Task<EsgAiRecommendationDTO?> GetLatestAsync(long loanApplicationId, string stage);
+        Task UpdateAsync(ESG_AI_RECOMMENDATION recommendation);
+        Task<ESG_AI_RECOMMENDATION?> GetLatestAsync(long loanApplicationId, string stage);
     }
 }
