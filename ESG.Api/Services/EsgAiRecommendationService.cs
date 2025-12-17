@@ -29,6 +29,28 @@ namespace ESG.Api.Services
             return Math.Round(Math.Min(confidence, 0.95m), 2);
         }
 
+        private string GetSectorName(int sectorId)
+        {
+            return sectorId switch
+            {
+                1 => "Agriculture",
+                2 => "Manufacturing",
+                3 => "Services",
+                _ => "Unknown"
+            };
+        }
+
+        private string GetProductName(int productId)
+        {
+            return productId switch
+            {
+                1 => "Overdraft",
+                2 => "Term Loan",
+                3 => "Invoice Discounting",
+                4 => "Contingent",
+                _ => "Others'"
+            };
+        }
         public async Task<EsgAiRecommendationDTO> PreScreenAsync(PreScreenRequest request)
         {
             var riskLevelId = request.sectorId == 2
@@ -42,6 +64,32 @@ namespace ESG.Api.Services
             var payload = JsonSerializer.Serialize(request);
             decimal computedConfidence = ComputeConfidence(request);
 
+            // --- EXPLAINABILITY LOGIC ---
+            var explainability = new List<ExplainabilityItem>();
+
+            // Sector impact
+            explainability.Add(new ExplainabilityItem
+            {
+                Factor = "Sector",
+                Impact = request.sectorId == 2 ? "Negative" : "Positive",
+                Detail = $"Sector = {GetSectorName(request.sectorId)} → {(request.sectorId == 2 ? "Higher ESG risk" : "Lower ESG risk")}"
+            });
+
+            // Loan Amount impact
+            explainability.Add(new ExplainabilityItem
+            {
+                Factor = "Loan Amount",
+                Impact = request.loanAmount > 1000000 ? "Neutral" : "Positive",
+                Detail = $"Loan Amount = {request.loanAmount:C} → {(request.loanAmount > 1000000 ? "Requires additional review" : "Within normal threshold")}"
+            });
+
+            // Product impact
+            explainability.Add(new ExplainabilityItem
+            {
+                Factor = "Product",
+                Impact = "Neutral",
+                Detail = $"Product ID = {GetProductName(request.productId)} → Standard ESG review"
+            });
             var recommendation = new EsgAiRecommendationDTO
             {
                 LoanApplicationId = request.loanApplicationId,
@@ -49,7 +97,8 @@ namespace ESG.Api.Services
                 RiskLevel = (short)riskLevelId,
                 Recommendation = recommendationText,
                 Confidence = computedConfidence,
-                Payload = payload
+                Payload = payload,
+                Explainability = explainability
             };
 
             var existingPrescreen = await _repo.GetLatestAsync(request.loanApplicationId, "PRE_SCREEN");
@@ -78,7 +127,7 @@ namespace ESG.Api.Services
 
                 await _repo.SaveAsync(preScreenRecommendation);
             }
-            
+
             return recommendation;
         }
 
@@ -105,7 +154,8 @@ namespace ESG.Api.Services
                 RiskLevel = (short)riskLevelId,
                 Recommendation = recommendation.ToString(),
                 Confidence = 0.92m,
-                Payload = JsonSerializer.Serialize(request)
+                Payload = JsonSerializer.Serialize(request),
+                Explainability = new List<ExplainabilityItem>()
             };
 
             var finalRecommendation = new ESG_AI_RECOMMENDATION

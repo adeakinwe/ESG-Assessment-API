@@ -1,12 +1,13 @@
 using ESG.Api.Data;
 using ESG.Api.DTOs;
+using ESG.Api.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESG.Api.Services
 {
     namespace ESG.Api.Services
     {
-        public class EsgExplainabilityService
+        public class EsgExplainabilityService : IEsgExplainabilityService
         {
             private readonly AppDbContext _context;
 
