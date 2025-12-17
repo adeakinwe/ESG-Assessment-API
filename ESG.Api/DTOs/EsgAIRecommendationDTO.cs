@@ -2,15 +2,15 @@ using ESGG.Api.Enums;
 
 namespace ESG.Api.DTOs
 {
-    public class EsgAiRecommendation
+    public class EsgAiRecommendationDTO
     {
         public int Id { get; set; }
         public int LoanApplicationId { get; set; }
 
         public string Stage { get; set; } = default!; // PRE_SCREEN / FINAL
 
-        public EsgAiRiskLevel RiskLevel { get; set; }
-        public required EsgAiRecommendation Recommendation { get; set; }
+        public short RiskLevel { get; set; }
+        public required string  Recommendation { get; set; }
 
         public decimal Confidence { get; set; }
 

@@ -10,7 +10,7 @@ namespace ESG.Api.Models
         [StringLength(50)]
         public string STAGE { get; set; } = default!; // PRE_SCREEN / FINAL
         [StringLength(50)]
-        public required string RISKLEVEL { get; set; }
+        public short RISKLEVEL { get; set; }
         public required string RECOMMENDATION  { get; set; }
         public decimal CONFIDENCE { get; set; }
         public string PAYLOAD { get; set; } = default!; // JSON
