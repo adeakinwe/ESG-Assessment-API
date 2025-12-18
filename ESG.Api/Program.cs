@@ -51,6 +51,7 @@ builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 builder.Services.AddScoped<IChecklistRepo, ChecklistRepo>();
 builder.Services.AddScoped<IEsgAiRecommendationRepo, EsgAiRecommendationRepo>();
 builder.Services.AddScoped<IEsgAiRecommendationService, EsgAiRecommendationService>();
+builder.Services.AddScoped<IEsgExplainabilityService, EsgExplainabilityService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

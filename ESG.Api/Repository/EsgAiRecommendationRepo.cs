@@ -1,4 +1,5 @@
 using ESG.Api.Data;
+using ESG.Api.DTos;
 using ESG.Api.Interface;
 using ESG.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ namespace ESG.Api.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ESG_AI_RECOMMENDATION?> GetLatestAsync(long loanApplicationId, string stage)
+        public async Task<ESG_AI_RECOMMENDATION?> GetEsgScreeningRecommendationAsync(long loanApplicationId, string stage)
         {
             var recommendation = await _context.ESG_AI_RECOMMENDATION
                 .Where(x => x.LOANAPPLICATIONID == loanApplicationId && x.STAGE == stage)
@@ -45,6 +46,20 @@ namespace ESG.Api.Repository
         {
             _context.ESG_AI_RECOMMENDATION.Update(recommendation);
             await _context.SaveChangesAsync();
+        }
+
+        public Task<EsgChecklistSummaryDto?> GetEsgAssessmentSummaryLiteAsync(long loanApplicationId)
+        {
+            var summary = _context.ESG_CHECKLIST_SUMMARY
+                .Where(x => x.LOANAPPLICATIONID == loanApplicationId)
+                .Select(x => new EsgChecklistSummaryDto
+                {
+                    ratingId = x.RATINGID,
+                    averageScore = x.AVGSCORE,
+                    confidence = 0.10m,
+                }).FirstOrDefaultAsync();
+
+            return summary;
         }
     }
 }

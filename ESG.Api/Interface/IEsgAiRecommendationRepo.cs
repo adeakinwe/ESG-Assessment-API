@@ -1,3 +1,4 @@
+using ESG.Api.DTos;
 using ESG.Api.DTOs;
 using ESG.Api.Models;
 
@@ -7,6 +8,7 @@ namespace ESG.Api.Interface
     {
         Task SaveAsync(ESG_AI_RECOMMENDATION recommendation);
         Task UpdateAsync(ESG_AI_RECOMMENDATION recommendation);
-        Task<ESG_AI_RECOMMENDATION?> GetLatestAsync(long loanApplicationId, string stage);
+        Task<ESG_AI_RECOMMENDATION?> GetEsgScreeningRecommendationAsync(long loanApplicationId, string stage);
+        Task<EsgChecklistSummaryDto?> GetEsgAssessmentSummaryLiteAsync(long loanApplicationId);
     }
 }

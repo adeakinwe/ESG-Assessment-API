@@ -10,10 +10,12 @@ namespace ESG.Api.Services
     public class EsgAiRecommendationService : IEsgAiRecommendationService
     {
         private readonly IEsgAiRecommendationRepo _repo;
+        private readonly IEsgExplainabilityService _explainabilityService;
 
-        public EsgAiRecommendationService(IEsgAiRecommendationRepo repo)
+        public EsgAiRecommendationService(IEsgAiRecommendationRepo repo, IEsgExplainabilityService explainabilityService)
         {
             _repo = repo;
+            _explainabilityService = explainabilityService;
         }
 
         private decimal ComputeConfidence(PreScreenRequest request)
@@ -101,7 +103,7 @@ namespace ESG.Api.Services
                 Explainability = explainability
             };
 
-            var existingPrescreen = await _repo.GetLatestAsync(request.loanApplicationId, "PRE_SCREEN");
+            var existingPrescreen = await _repo.GetEsgScreeningRecommendationAsync(request.loanApplicationId, "PRE_SCREEN");
             if (existingPrescreen != null)
             {
                 existingPrescreen.RISKLEVEL = recommendation.RiskLevel;
@@ -131,6 +133,47 @@ namespace ESG.Api.Services
             return recommendation;
         }
 
+        public async Task<EsgFinalRecommendationDTO> GenerateFinalRecommendationAsync(int loanApplicationId)
+        {
+            // 1️⃣ Fetch all inputs
+            var preScreen = await _repo.GetEsgScreeningRecommendationAsync(loanApplicationId, "PRE_SCREEN");
+            var summary = await _repo.GetEsgAssessmentSummaryLiteAsync(loanApplicationId);
+            var explainability = await _explainabilityService.GenerateExplainabilityAsync(loanApplicationId);
+
+            // 2️⃣ Compute final risk (simplified weighted logic)
+            short finalRisk = summary?.averageScore >= 65 || preScreen?.RISKLEVEL == (short)EsgAiRiskLevelEnum.High
+                ? (short)EsgAiRiskLevelEnum.High
+                : summary?.averageScore >= 35
+                    ? (short)EsgAiRiskLevelEnum.Medium
+                    : (short)EsgAiRiskLevelEnum.Low;
+
+            // 3️⃣ Generate executive summary
+            string summaryText = $"The loan application shows a {summary?.rating} ESG risk. " +
+                                 $"{(explainability.Flags.Any() ? "High-risk areas identified: " + string.Join(", ", explainability.Flags) + ". " : "")}" +
+                                 $"{(explainability.MitigationHints.Any() ? "Recommended mitigation: " + string.Join(", ", explainability.MitigationHints) + "." : "")}";
+
+            // 4️⃣ Recommendation text
+            string recommendation = finalRisk switch
+            {
+                (short)EsgAiRiskLevelEnum.High => "Enhanced Due Diligence and Mitigation Measures Required",
+                (short)EsgAiRiskLevelEnum.Medium => "Proceed with Conditions and Secondary Review",
+                _ => "Proceed with Standard Review"
+            };
+
+            // 5️⃣ Confidence computation (example: average of pre-screen & assessment confidence)
+            decimal? confidence = Math.Round((preScreen.CONFIDENCE + summary.confidence) / 2, 2);
+
+            return new EsgFinalRecommendationDTO
+            {
+                LoanApplicationId = loanApplicationId,
+                Recommendation = recommendation,
+                RiskLevel = finalRisk,
+                Confidence = (decimal)confidence,
+                Flags = explainability.Flags,
+                MitigationHints = explainability.MitigationHints,
+                SummaryText = summaryText
+            };
+        }
         public async Task<EsgAiRecommendationDTO> FinalRecommendationAsync(FinalAssessmentRequest request)
         {
             var riskLevelId = request.averageScore >= 65

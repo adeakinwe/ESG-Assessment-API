@@ -7,5 +7,6 @@ namespace ESG.Api.Services
     {
         Task<EsgAiRecommendationDTO> PreScreenAsync(PreScreenRequest request);
         Task<EsgAiRecommendationDTO> FinalRecommendationAsync(FinalAssessmentRequest request);
+        Task<EsgFinalRecommendationDTO> GenerateFinalRecommendationAsync(int loanApplicationId);
     }
 }

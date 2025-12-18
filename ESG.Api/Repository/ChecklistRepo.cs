@@ -91,12 +91,25 @@ namespace ESG.Api.Repository
 
             // 2️⃣ Calculate summary
             double totalScore = dto.Items.Sum(i => i.Score * i.Weight);
-            double totalWeight = dto.Items.Sum(i => i.Weight * 10);
+            double totalWeight = dto.Items.Sum(i => i.Weight * 10); //weight * max score (10)
             double averageScore = totalWeight > 0 ? Math.Round(totalScore / totalWeight * 100, 2) : 0;
 
             int ratingId = averageScore >= 65 ? 3  // High
                           : averageScore >= 35 && averageScore < 65 ? 2 // Medium
                           : 1;                     // Low
+
+            // Calculate confidence
+            int totalItems = 30; // total checklist items
+            int answeredItems = dto.Items.Count;
+            decimal answeredWeight = dto.Items.Sum(i => i.Weight * 10); // weight * max score (10)
+            List<decimal> scores = dto.Items.Select(i => (decimal)i.Score).ToList();
+            
+            decimal confidence = CalculateSummaryConfidence(
+                totalItems,
+                answeredItems,
+                (decimal)totalWeight,
+                (decimal)answeredWeight,
+                scores);
 
             var summary = new ESG_CHECKLIST_SUMMARY
             {
@@ -105,13 +118,70 @@ namespace ESG.Api.Repository
                 TOTALWEIGHT = totalWeight,
                 AVGSCORE = averageScore,
                 RATINGID = ratingId,
-                COMMENT_ = dto.Comment
+                COMMENT_ = dto.Comment,
+                CONFIDENCE = confidence
             };
 
             _context.ESG_CHECKLIST_SUMMARY.Add(summary);
 
             // 3️⃣ Save all changes in one transaction
             await _context.SaveChangesAsync();
+        }
+
+        public decimal CalculateSummaryConfidence(
+            int totalItems,
+            int answeredItems,
+            decimal totalWeight,
+            decimal answeredWeight,
+            List<decimal> scores)
+        {
+            if (totalItems == 0 || answeredItems == 0)
+                return 0.00m;
+
+            // 1️⃣ Completion
+            decimal completionScore = Math.Min(
+                (decimal)answeredItems / totalItems, 1.0m);
+
+            // 2️⃣ Weight Coverage
+            decimal weightCoverageScore = totalWeight == 0
+                ? 0
+                : Math.Min(answeredWeight / totalWeight, 1.0m);
+
+            // 3️⃣ Consistency (variance)
+            decimal variance = CalculateVariance(scores);
+            decimal consistencyScore = variance switch
+            {
+                <= 2 => 1.0m,
+                <= 5 => 0.85m,
+                <= 10 => 0.65m,
+                _ => 0.40m
+            };
+
+            // 4️⃣ Data Sufficiency
+            decimal dataSufficiencyScore = answeredItems switch
+            {
+                >= 30 => 1.0m,
+                >= 20 => 0.85m,
+                >= 10 => 0.65m,
+                _ => 0.40m
+            };
+
+            // Final Confidence
+            decimal confidence =
+                (completionScore * 0.35m) +
+                (weightCoverageScore * 0.25m) +
+                (consistencyScore * 0.25m) +
+                (dataSufficiencyScore * 0.15m);
+
+            return Math.Round(confidence, 2);
+        }
+
+        private decimal CalculateVariance(List<decimal> scores)
+        {
+            if (!scores.Any()) return 0;
+
+            decimal avg = scores.Average();
+            return scores.Average(s => (s - avg) * (s - avg));
         }
 
         public async Task<EsgChecklistSubmissionDto> GetChecklistAssessmentByLoanIdAsync(int loanApplicationId)

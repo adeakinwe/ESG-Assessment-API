@@ -25,5 +25,6 @@ namespace ESG.Api.DTos
         public double averageScore { get; set; }
         public string? rating { get; set; }
         public string? comment { get; set; }
+        public decimal confidence { get; set; }
     }
 }
