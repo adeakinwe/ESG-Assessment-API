@@ -161,9 +161,11 @@ namespace ESG.Api.Services
             };
 
             // 5️⃣ Confidence computation (example: average of pre-screen & assessment confidence)
-            decimal? confidence = Math.Round((preScreen.CONFIDENCE + summary.confidence) / 2, 2);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            decimal confidence = Math.Round((preScreen.CONFIDENCE + summary.confidence) / 2, 2);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-            return new EsgFinalRecommendationDTO
+            var finalRecommendation = new EsgFinalRecommendationDTO
             {
                 LoanApplicationId = loanApplicationId,
                 Recommendation = recommendation,
@@ -173,6 +175,35 @@ namespace ESG.Api.Services
                 MitigationHints = explainability.MitigationHints,
                 SummaryText = summaryText
             };
+
+            var existingFinalRecommendation = await _repo.GetEsgScreeningRecommendationAsync(loanApplicationId, "FINAL");
+            if (existingFinalRecommendation != null)
+            {
+                existingFinalRecommendation.RISKLEVEL = finalRecommendation.RiskLevel;
+                existingFinalRecommendation.RECOMMENDATION = finalRecommendation.Recommendation;
+                existingFinalRecommendation.CONFIDENCE = finalRecommendation.Confidence;
+                existingFinalRecommendation.PAYLOAD = preScreen.PAYLOAD;
+                existingFinalRecommendation.LASTUPDATEDBY = 1;
+                existingFinalRecommendation.DATETIMEUPDATED = DateTime.Now;
+
+                await _repo.UpdateAsync(existingFinalRecommendation);
+            }
+            else
+            {
+                var preScreenRecommendation = new ESG_AI_RECOMMENDATION
+                {
+                    LOANAPPLICATIONID = loanApplicationId,
+                    STAGE = "FINAL",
+                    RISKLEVEL = (short)finalRecommendation.RiskLevel,
+                    RECOMMENDATION = finalRecommendation.Recommendation,
+                    CONFIDENCE = finalRecommendation.Confidence,
+                    PAYLOAD = preScreen.PAYLOAD,
+                };
+
+                await _repo.SaveAsync(preScreenRecommendation);
+            }
+
+            return finalRecommendation;
         }
         public async Task<EsgAiRecommendationDTO> FinalRecommendationAsync(FinalAssessmentRequest request)
         {

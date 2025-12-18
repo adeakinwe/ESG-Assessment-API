@@ -22,7 +22,14 @@ namespace ESG.Api.Controller
             return Ok(result);
         }
 
-        [HttpPost("final-recommendation")]
+        [HttpGet("final/{loanApplicationId:int}")]
+        public async Task<IActionResult> FinalRecommendation(int loanApplicationId)
+        {
+            var result = await _service.GenerateFinalRecommendationAsync(loanApplicationId);
+            return Ok(result);
+        }
+
+        [HttpPost("final-recommendation-alt")]
         public async Task<IActionResult> Final([FromBody] FinalAssessmentRequest request)
         {
             var result = await _service.FinalRecommendationAsync(request);

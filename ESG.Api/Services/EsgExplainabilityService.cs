@@ -39,12 +39,16 @@ namespace ESG.Api.Services
                 MitigationHints = new List<string>()
             };
 
+            var mitigatedCategories = new List<string>();
+
             foreach (var item in assessments)
             {
                 // Normalize contribution for consistent 0–100 scale
                 double maxScore = 10; // adjust if your max SCORE differs
                 double contribution = item.a.SCORE * item.a.WEIGHT;
                 double normalizedContribution = contribution / (maxScore * item.a.WEIGHT) * 100;
+
+                var category = item.b.CATEGORY?.ToUpper();
 
                 // Determine impact (reverse because high score = high risk)
                 string impact = normalizedContribution switch
@@ -70,9 +74,18 @@ namespace ESG.Api.Services
                     explainability.Flags.Add(
                         $"{item.b.CATEGORY}: High risk response on \"{item.b.CHECKLISTITEM}\""
                     );
-                    explainability.MitigationHints.Add(
-                        $"Mitigation needed for {item.b.CATEGORY?.ToLower()} risk"
-                    );
+                    if (!string.IsNullOrEmpty(category) && !mitigatedCategories.Contains(category))
+                    {
+                        mitigatedCategories.Add(category);
+
+                        explainability.MitigationHints.Add(category switch
+                        {
+                            "ENVIRONMENT" => "Environmental risk identified: emissions, waste management, or resource impact require mitigation",
+                            "SOCIAL" => "Social risk identified: labor practices, health & safety, or community impact require mitigation",
+                            "GOVERNANCE" => "Governance risk identified: compliance, controls, or oversight require strengthening",
+                            _ => "Mitigation required for identified ESG risks"
+                        });
+                    }
                 }
             }
 
