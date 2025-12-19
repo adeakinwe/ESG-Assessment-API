@@ -7,3 +7,6 @@ dotnet_diagnostic.CS8603.severity = silent
 
 # CS8981: The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 dotnet_diagnostic.CS8981.severity = none
+
+# CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.CS8602.severity = silent

@@ -35,5 +35,6 @@ namespace ESG.Api.DTOs
         public required List<string> Flags { get; set; }    // High-risk items
         public required List<string> MitigationHints { get; set; } // Guidance
         public required string SummaryText { get; set; }    // Executive-friendly summary
+        public EsgMlSignalDTO MlSignals { get; set; } = default!;
     }
 }

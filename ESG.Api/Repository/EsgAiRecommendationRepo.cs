@@ -56,7 +56,7 @@ namespace ESG.Api.Repository
                 {
                     ratingId = x.RATINGID,
                     averageScore = x.AVGSCORE,
-                    confidence = 0.10m,
+                    confidence = x.CONFIDENCE,
                 }).FirstOrDefaultAsync();
 
             return summary;

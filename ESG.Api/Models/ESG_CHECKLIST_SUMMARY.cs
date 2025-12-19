@@ -22,6 +22,6 @@ namespace ESG.Api.Models
         public string? COMMENT_ { get; set; }
         public int CREATEDBY { get; set; } = 1;
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
-        public decimal CONFIDENCE { get; set; }
+        public decimal CONFIDENCE { get; set; } = 0.00m;
     }
 }

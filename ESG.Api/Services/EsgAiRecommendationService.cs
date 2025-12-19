@@ -11,11 +11,16 @@ namespace ESG.Api.Services
     {
         private readonly IEsgAiRecommendationRepo _repo;
         private readonly IEsgExplainabilityService _explainabilityService;
+        private readonly IEsgMlFeatureService _featureService;
+        private readonly IEsgMlSignalService _mlSignalService;
 
-        public EsgAiRecommendationService(IEsgAiRecommendationRepo repo, IEsgExplainabilityService explainabilityService)
+        public EsgAiRecommendationService(IEsgAiRecommendationRepo repo,
+        IEsgExplainabilityService explainabilityService, IEsgMlFeatureService featureService, IEsgMlSignalService mlSignalService)
         {
             _repo = repo;
             _explainabilityService = explainabilityService;
+            _featureService = featureService;
+            _mlSignalService = mlSignalService;
         }
 
         private decimal ComputeConfidence(PreScreenRequest request)
@@ -160,23 +165,31 @@ namespace ESG.Api.Services
                 _ => "Proceed with Standard Review"
             };
 
-            // 5️⃣ Confidence computation (example: average of pre-screen & assessment confidence)
+            //             // 5️⃣ Confidence computation (example: average of pre-screen & assessment confidence)
+            // #pragma warning disable CS8602 // Dereference of a possibly null reference.
+            //             decimal confidence = Math.Round((preScreen.CONFIDENCE + summary.confidence) / 2, 2);
+            // #pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            var features = await _featureService.ExtractFeaturesAsync(loanApplicationId);
+            var mlSignal = await _mlSignalService.EvaluateAsync(features);
+
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-            decimal confidence = Math.Round((preScreen.CONFIDENCE + summary.confidence) / 2, 2);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            decimal finalConfidence = ComposeConfidence(preScreen?.CONFIDENCE, summary.confidence, mlSignal);
 
             var finalRecommendation = new EsgFinalRecommendationDTO
             {
                 LoanApplicationId = loanApplicationId,
                 Recommendation = recommendation,
                 RiskLevel = finalRisk,
-                Confidence = (decimal)confidence,
+                Confidence = finalConfidence,
                 Flags = explainability.Flags,
                 MitigationHints = explainability.MitigationHints,
-                SummaryText = summaryText
+                SummaryText = summaryText,
+                MlSignals = mlSignal
             };
 
             var existingFinalRecommendation = await _repo.GetEsgScreeningRecommendationAsync(loanApplicationId, "FINAL");
+
             if (existingFinalRecommendation != null)
             {
                 existingFinalRecommendation.RISKLEVEL = finalRecommendation.RiskLevel;
@@ -194,17 +207,39 @@ namespace ESG.Api.Services
                 {
                     LOANAPPLICATIONID = loanApplicationId,
                     STAGE = "FINAL",
-                    RISKLEVEL = (short)finalRecommendation.RiskLevel,
+                    RISKLEVEL = finalRecommendation.RiskLevel,
                     RECOMMENDATION = finalRecommendation.Recommendation,
                     CONFIDENCE = finalRecommendation.Confidence,
                     PAYLOAD = preScreen.PAYLOAD,
                 };
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
                 await _repo.SaveAsync(preScreenRecommendation);
             }
 
             return finalRecommendation;
         }
+
+        private decimal ComposeConfidence(decimal? preScreenConfidence, decimal assessmentConfidence, EsgMlSignalDTO ml)
+        {
+            var confidence = assessmentConfidence;
+
+            // Blend pre-screen softly
+            if (preScreenConfidence.HasValue)
+                confidence = (confidence * 0.7m) + (preScreenConfidence.Value * 0.3m);
+
+            // Penalize uncertainty
+            if (ml.IsOutlier)
+                confidence -= 0.15m;
+
+            // Reward strong signal alignment
+            if (ml.RiskProbability > 0.75m)
+                confidence += 0.05m;
+
+            // Regulatory clamp
+            return Math.Clamp(confidence, 0.55m, 0.95m);
+        }
+
         public async Task<EsgAiRecommendationDTO> FinalRecommendationAsync(FinalAssessmentRequest request)
         {
             var riskLevelId = request.averageScore >= 65
