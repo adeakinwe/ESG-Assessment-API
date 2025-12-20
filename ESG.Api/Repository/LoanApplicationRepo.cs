@@ -73,7 +73,8 @@ namespace ESG.Api.Repository
                 riskRating = _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 3 ? "High"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
-                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false
+                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false,
+                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? ""
             }).ToList();
 
             return loanApplications;
@@ -102,7 +103,8 @@ namespace ESG.Api.Repository
                 riskRating = _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 3 ? "High"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
-                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false
+                submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false,
+                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? ""
             }).FirstOrDefault();
 
             return loanApplication!;

@@ -33,5 +33,6 @@ namespace ESG.API.DTOs
         public int riskRatingId { get; set; }
         public required string riskRating { get; set; }
         public bool? submittedForAppraisal { get; set; }
+        public string country { get; set; } = null!;
     }
 }

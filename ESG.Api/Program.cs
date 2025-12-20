@@ -9,8 +9,9 @@ var env = builder.Environment;
 Console.WriteLine($"Current Environment: {env.EnvironmentName}");
 
 // Get MySQL password from environment variables (SECURE)
-string mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD") ?? "mysqluser10$";
+//string mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD") ?? "ESddRkwajsULbUiLLSvYKXCjzXlDecaC";
 //string mysqlPassword = builder.Configuration["MYSQL_ROOT_PASSWORD"];
+string mysqlPassword = "ESddRkwajsULbUiLLSvYKXCjzXlDecaC";
 Console.WriteLine($"Password: {mysqlPassword}");
 if (string.IsNullOrWhiteSpace(mysqlPassword))
 {
