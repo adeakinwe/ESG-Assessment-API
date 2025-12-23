@@ -17,7 +17,8 @@ namespace ESG.Api.Repository
         {
             ArgumentNullException.ThrowIfNull(model);
 
-            var newLoanApplication = new LOAN_APPLICATION {
+            var newLoanApplication = new LOAN_APPLICATION
+            {
                 CUSTOMERID = model.customerId,
                 PRODUCTID = model.productId,
                 AMOUNT = model.amount,
@@ -30,7 +31,16 @@ namespace ESG.Api.Repository
             };
 
             _context.LOAN_APPLICATION.Add(newLoanApplication);
+            SaveChanges();
+
+            newLoanApplication.APPLREFERENCENUMBER = GenerateReference(newLoanApplication);
+
             return SaveChanges();
+        }
+
+        private string GenerateReference(LOAN_APPLICATION loan)
+        {
+            return $"GLN-{loan.APPLICATIONDATE:yyyyMMdd}-{loan.LOANAPPLICATIONID:D6}";
         }
 
         public bool DeleteLoanApplication(int id)
@@ -65,7 +75,7 @@ namespace ESG.Api.Repository
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 3 ? "Services" :
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 4 ? "Trade" :
                              _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).First() == 5 ? "Oil and Gas" : "Others",
-                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
+                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others",
                 applicationDate = x.APPLICATIONDATE,
                 approvalStatusId = x.APPROVALSTATUSID,
                 statusName = _context.APPROVAL_STATUS.Where(a => a.APPROVALSTATUSID == x.APPROVALSTATUSID).Select(a => a.NAME).FirstOrDefault() ?? "Pending",
@@ -92,7 +102,7 @@ namespace ESG.Api.Repository
                 tenorInDays = x.TENOR,
                 interestRate = x.INTERESTRATE,
                 loanPurpose = x.LOANPURPOSE,
-                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others" ,
+                currencyCode = x.CURRENCYID == 1 ? "NGN" : x.CURRENCYID == 2 ? "USD" : x.CURRENCYID == 3 ? "GBP" : x.CURRENCYID == 4 ? "EUR" : "Others",
                 applicationDate = x.APPLICATIONDATE,
                 approvalStatusId = x.APPROVALSTATUSID,
                 statusName = _context.APPROVAL_STATUS.Where(a => a.APPROVALSTATUSID == x.APPROVALSTATUSID).Select(a => a.NAME).FirstOrDefault() ?? "Pending",
