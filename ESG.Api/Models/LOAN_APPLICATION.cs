@@ -30,6 +30,6 @@ namespace ESG.Api.Models
         public DateTime DATETIMECREATED { get; set; } = DateTime.Now;
         public bool? SUBMITTEDFORAPPRAISAL { get; set; }
         [StringLength(30)]
-        public string? APPLREFERENCENUMBER { get; set; }
+        public string APPLREFERENCENUMBER { get; set; } = string.Empty;
     }
 }
