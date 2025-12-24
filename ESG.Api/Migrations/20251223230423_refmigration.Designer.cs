@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ESG.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251223225835_refmigration")]
+    [Migration("20251223230423_refmigration")]
     partial class refmigration
     {
         /// <inheritdoc />
@@ -307,6 +307,7 @@ namespace ESG.Api.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("APPLREFERENCENUMBER")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 

@@ -304,6 +304,7 @@ namespace ESG.Api.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("APPLREFERENCENUMBER")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 

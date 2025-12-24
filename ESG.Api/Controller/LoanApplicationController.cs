@@ -1,4 +1,5 @@
 using ESG.Api.Interface;
+using ESG.Api.Migrations;
 using ESG.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,11 +47,11 @@ namespace ESG.Api.Controller
         {
             ArgumentNullException.ThrowIfNull(loanApplicaion);
 
-            bool status = _repo.CreateLoanApplication(loanApplicaion);
+            string refNumber = _repo.CreateLoanApplication(loanApplicaion);
 
-            if (status)
+            if (!string.IsNullOrEmpty(refNumber))
             {
-                return Ok();
+                return Ok(new { status = true, result = refNumber, message = "Loan Application added successfully" });
             }
 
             return NotFound(new { status = false, message = "Loan Application not added. Kindly contact Admin" });

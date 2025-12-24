@@ -13,7 +13,7 @@ namespace ESG.Api.Repository
         {
             _context = context;
         }
-        public bool CreateLoanApplication(LoanApplicationForCreationDTO model)
+        public string CreateLoanApplication(LoanApplicationForCreationDTO model)
         {
             ArgumentNullException.ThrowIfNull(model);
 
@@ -31,11 +31,17 @@ namespace ESG.Api.Repository
             };
 
             _context.LOAN_APPLICATION.Add(newLoanApplication);
-            SaveChanges();
+            bool saved = SaveChanges();
 
-            newLoanApplication.APPLREFERENCENUMBER = GenerateReference(newLoanApplication);
+            if (saved)
+            {
+                newLoanApplication.APPLREFERENCENUMBER = GenerateReference(newLoanApplication);
+                SaveChanges();
+                
+                return newLoanApplication.APPLREFERENCENUMBER;
+            }
 
-            return SaveChanges();
+            return string.Empty;
         }
 
         private string GenerateReference(LOAN_APPLICATION loan)
@@ -84,7 +90,8 @@ namespace ESG.Api.Repository
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
                 submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false,
-                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? ""
+                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? "",
+                applRefNumber = x.APPLREFERENCENUMBER
             }).ToList();
 
             return loanApplications;
@@ -114,7 +121,8 @@ namespace ESG.Api.Repository
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 2 ? "Medium"
                              : _context.ESG_CHECKLIST_SUMMARY.Where(s => s.LOANAPPLICATIONID == x.LOANAPPLICATIONID).Select(s => s.RATINGID).FirstOrDefault() == 1 ? "Low" : "Not Rated",
                 submittedForAppraisal = x.SUBMITTEDFORAPPRAISAL ?? false,
-                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? ""
+                country = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.ADDRESS).FirstOrDefault() ?? "",
+                applRefNumber = x.APPLREFERENCENUMBER
             }).FirstOrDefault();
 
             return loanApplication!;
@@ -137,7 +145,6 @@ namespace ESG.Api.Repository
             if (loanApplication != null)
             {
                 loanApplication.SUBMITTEDFORAPPRAISAL = true;
-                //_context.LOAN_APPLICATION.Update(loanApplication);
                 return await _context.SaveChangesAsync() != 0;
             }
 

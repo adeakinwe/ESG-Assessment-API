@@ -15,3 +15,4 @@ dotnet run
 
 # Migrations
 dotnet ef migrations add initmigration
+dotnet ef database update 

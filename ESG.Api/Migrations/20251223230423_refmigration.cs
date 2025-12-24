@@ -15,7 +15,8 @@ namespace ESG.Api.Migrations
                 table: "LOAN_APPLICATION",
                 type: "varchar(30)",
                 maxLength: 30,
-                nullable: true)
+                nullable: false,
+                defaultValue: "")
                 .Annotation("MySql:CharSet", "utf8mb4");
         }
 
