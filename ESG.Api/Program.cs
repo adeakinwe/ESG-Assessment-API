@@ -9,9 +9,8 @@ var env = builder.Environment;
 Console.WriteLine($"Current Environment: {env.EnvironmentName}");
 
 // Get MySQL password from environment variables (SECURE)
-//string mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD") ?? "ESddRkwajsULbUiLLSvYKXCjzXlDecaC";
-//string mysqlPassword = builder.Configuration["MYSQL_ROOT_PASSWORD"];
-string mysqlPassword = "mysqluser10$";
+string mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD") ?? "";
+
 Console.WriteLine($"Password: {mysqlPassword}");
 if (string.IsNullOrWhiteSpace(mysqlPassword))
 {
@@ -22,9 +21,9 @@ if (string.IsNullOrWhiteSpace(mysqlPassword))
 string connectionString = builder.Configuration.GetConnectionString("Conn") ?? "";
 
 // Get current environment from configuration
-var currentEnv =  builder.Configuration["CurrentEnvironment"];
-Console.WriteLine($"Current Environment from Config: {currentEnv}");
-bool isProdEnv = currentEnv?.ToLower() == "production" ? true : false;
+var currentDB =  builder.Configuration["currentDB"];
+Console.WriteLine($"Current DB from Config: {currentDB}");
+bool isSQL = currentDB == "SQL" ? true : false;
 
 //Inject MySQL password into connection string if it's missing
 if (!string.IsNullOrWhiteSpace(mysqlPassword) && connectionString.Contains("__MYSQL_ROOT_PASSWORD__"))
@@ -35,15 +34,15 @@ if (!string.IsNullOrWhiteSpace(mysqlPassword) && connectionString.Contains("__MY
 Console.WriteLine($"ConnectionString: {connectionString}");
 
 // Add services to the container.
-if (isProdEnv)
+if (isSQL)
 {
-    Console.WriteLine("Running in Production mode (Using MySQL)");
+    Console.WriteLine($"Running in {env.EnvironmentName} mode (Using MySQL)");
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 }
 else
 {
-    Console.WriteLine("Running in Development mode (Using In-Memory Database)");
+    Console.WriteLine($"Running in {env.EnvironmentName} mode (Using In-Memory Database)");
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseInMemoryDatabase("InMem"));
 }
@@ -72,13 +71,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-PrepDb.PrepPopulation(app, isProdEnv);
+PrepDb.PrepPopulation(app, isSQL);
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseAuthorization();
 app.MapControllers();
 app.UseCors();

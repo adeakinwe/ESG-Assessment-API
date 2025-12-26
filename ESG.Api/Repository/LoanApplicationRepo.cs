@@ -68,7 +68,8 @@ namespace ESG.Api.Repository
             var loanApplications = _context.LOAN_APPLICATION.Select(x => new LoanApplicationForReturnDTO
             {
                 customerName = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.FIRSTNAME + " " + c.LASTNAME).FirstOrDefault() ?? "",
-                productName = x.PRODUCTID == 1 ? "Term Loan" : x.PRODUCTID == 2 ? "Overdraft" : "Others",
+                productName = x.PRODUCTID == 1 ? "Overdraft" : x.PRODUCTID == 2 ? "Term Loan" : x.PRODUCTID == 3 ? "Invoice Discounting" :
+                x.PRODUCTID == 4 ? "Contingent" : "Others",
                 amount = x.AMOUNT,
                 productId = x.PRODUCTID,
                 sectorId = _context.CUSTOMER.Where(c => c.CUSTOMERID == x.CUSTOMERID).Select(c => c.SECTOR).FirstOrDefault(),

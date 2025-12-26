@@ -5,7 +5,7 @@ namespace ESG.Api.Data
 {
     public static class PrepDb
     {
-        public static void PrepPopulation(IApplicationBuilder app, bool isProd)
+        public static void PrepPopulation(IApplicationBuilder app, bool isSQL)
         {
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
@@ -13,7 +13,7 @@ namespace ESG.Api.Data
                 try
                 {
                     var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    SeedData(context, isProd);
+                    SeedData(context, isSQL);
                 }
                 catch (Exception ex)
                 {
@@ -24,9 +24,9 @@ namespace ESG.Api.Data
 
         }
 
-        public static void SeedData(AppDbContext context, bool isProd)
+        public static void SeedData(AppDbContext context, bool isSQL)
         {
-            if (isProd)
+            if (isSQL)
             {
                 Console.WriteLine("Running database migration...");
                 bool migrationSuccess = false;
