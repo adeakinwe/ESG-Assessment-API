@@ -127,7 +127,7 @@ builder.Services.AddRateLimiter(options =>
             GetClientKey(context),
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 3,
+                PermitLimit = 1,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
@@ -157,9 +157,9 @@ PrepDb.PrepPopulation(app, isSQL);
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthorization();
+app.UseCors();
 app.UseRateLimiter();
 app.MapControllers();
-app.UseCors();
 //app.UseHttpsRedirection();
 
 app.Run();
