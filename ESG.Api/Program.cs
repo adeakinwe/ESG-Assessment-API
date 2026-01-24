@@ -74,19 +74,23 @@ builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    options.OnRejected = async (context, cancellationToken) =>
+    options.OnRejected = async (context, _) =>
     {
-    var retryAfter = context.Lease.TryGetMetadata(
-        MetadataName.RetryAfter,
-        out var retryAfterValue)
-        ? ((int)retryAfterValue.TotalSeconds).ToString()
-        : "60";
+        var retryAfter = context.Lease.TryGetMetadata(
+            MetadataName.RetryAfter,
+            out var retryAfterTime)
+            ? retryAfterTime
+            : TimeSpan.FromSeconds(60);
 
-    context.HttpContext.Response.Headers["Retry-After"] = retryAfter;
-    await context.HttpContext.Response.WriteAsync(
-        "Too many requests. Please try again later.",
-        cancellationToken);
-    };
+        var retryAtUtc = DateTimeOffset.UtcNow.Add(retryAfter);
+
+        context.HttpContext.Response.Headers["Retry-After"] =
+            retryAtUtc.ToString("R"); // RFC 1123 format
+
+        await context.HttpContext.Response.WriteAsync(
+            $"Too many requests. Retry at {retryAtUtc:HH:mm:ss} UTC"
+        );
+    };    
     
     options.AddPolicy("GetChecklists", context =>
         RateLimitPartition.GetFixedWindowLimiter(
