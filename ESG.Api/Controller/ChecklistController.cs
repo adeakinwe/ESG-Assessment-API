@@ -2,6 +2,7 @@ using ESG.Api.DTos;
 using ESG.Api.Interface;
 using ESG.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 namespace ESG.API.Controller
 {
     [Route("api/checklist")]
@@ -16,6 +17,7 @@ namespace ESG.API.Controller
         }
 
         [HttpGet("checklist-item")]
+        [EnableRateLimiting("GetChecklists")]
         public async Task<IActionResult> GetChecklistAsync()
         {
             var data = await _repo.GetChecklistAsync();

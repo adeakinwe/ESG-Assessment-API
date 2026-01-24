@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using ESG.Api.Data;
 using ESG.Api.Interface;
 using ESG.Api.Repository;
@@ -21,7 +22,7 @@ if (string.IsNullOrWhiteSpace(mysqlPassword))
 string connectionString = builder.Configuration.GetConnectionString("Conn") ?? "";
 
 // Get current environment from configuration
-var currentDB =  builder.Configuration["currentDB"];
+var currentDB = builder.Configuration["currentDB"];
 Console.WriteLine($"Current DB from Config: {currentDB}");
 bool isSQL = currentDB == "SQL" ? true : false;
 
@@ -66,9 +67,84 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+    var retryAfter = context.Lease.TryGetMetadata(
+        MetadataName.RetryAfter,
+        out var retryAfterValue)
+        ? ((int)retryAfterValue.TotalSeconds).ToString()
+        : "60";
+
+    context.HttpContext.Response.Headers["Retry-After"] = retryAfter;
+    await context.HttpContext.Response.WriteAsync(
+        "Too many requests. Please try again later.",
+        cancellationToken);
+    };
+    
+    options.AddPolicy("GetChecklists", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("GetAllLoanApplications", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("AssessmentSubmit", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("LoanCreate", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("AiRecommendation", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 2,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
+string GetClientKey(HttpContext context)
+{
+    return context.User.Identity?.IsAuthenticated == true
+        ? context.User.Identity!.Name!
+        : context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+}
 
 var app = builder.Build();
 PrepDb.PrepPopulation(app, isSQL);
@@ -77,6 +153,7 @@ PrepDb.PrepPopulation(app, isSQL);
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 app.UseCors();
 //app.UseHttpsRedirection();

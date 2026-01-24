@@ -1,6 +1,7 @@
 using ESG.Api.Contracts;
 using ESG.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ESG.Api.Controller
 {
@@ -23,6 +24,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("final/{loanApplicationId:int}")]
+        [EnableRateLimiting("AiRecommendation")]
         public async Task<IActionResult> FinalRecommendation(int loanApplicationId)
         {
             var result = await _service.GenerateFinalRecommendationAsync(loanApplicationId);

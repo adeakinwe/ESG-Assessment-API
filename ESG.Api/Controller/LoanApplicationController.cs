@@ -1,7 +1,7 @@
 using ESG.Api.Interface;
-using ESG.Api.Migrations;
 using ESG.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ESG.Api.Controller
 {
@@ -17,6 +17,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("all")]
+        [EnableRateLimiting("GetAllLoanApplications")]
         public ActionResult<List<LoanApplicationForReturnDTO>> GetAllLoanApplication()
         {
             var loanApplications = _repo.GetAllLoanApplication();
@@ -43,6 +44,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpPost("add")]
+        [EnableRateLimiting("LoanCreate")]
         public ActionResult<CustomerForReturnDTO> CreateLoanApplication(LoanApplicationForCreationDTO loanApplicaion)
         {
             ArgumentNullException.ThrowIfNull(loanApplicaion);
@@ -58,6 +60,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("submit-for-appraisal/{id:int}")]
+        [EnableRateLimiting("AssessmentSubmit")]
         public async Task<IActionResult> SubmitLoanApplicationForAppraisalAsync(int id)
         {
             try
