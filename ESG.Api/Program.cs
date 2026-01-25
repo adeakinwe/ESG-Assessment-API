@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using ESG.Api.Common;
 using ESG.Api.Data;
 using ESG.Api.Interface;
 using ESG.Api.Repository;
@@ -70,86 +71,86 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+// builder.Services.AddRateLimiter(options =>
+// {
+//     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    options.OnRejected = async (context, _) =>
-    {
-        var retryAfter = context.Lease.TryGetMetadata(
-            MetadataName.RetryAfter,
-            out var retryAfterTime)
-            ? retryAfterTime
-            : TimeSpan.FromSeconds(60);
+//     options.OnRejected = async (context, _) =>
+//     {
+//         var retryAfter = context.Lease.TryGetMetadata(
+//             MetadataName.RetryAfter,
+//             out var retryAfterTime)
+//             ? retryAfterTime
+//             : TimeSpan.FromSeconds(60);
 
-        var retryAtUtc = DateTimeOffset.UtcNow.Add(retryAfter);
+//         var retryAtUtc = DateTimeOffset.UtcNow.Add(retryAfter);
 
-        context.HttpContext.Response.Headers["Retry-After"] =
-            retryAtUtc.ToString("R"); // RFC 1123 format
+//         context.HttpContext.Response.Headers["Retry-After"] =
+//             retryAtUtc.ToString("R"); // RFC 1123 format
 
-        await context.HttpContext.Response.WriteAsync(
-            $"Too many requests. Retry at {retryAtUtc:HH:mm:ss} UTC"
-        );
-    };    
+//         await context.HttpContext.Response.WriteAsync(
+//             $"Too many requests. Retry at {retryAtUtc:HH:mm:ss} UTC"
+//         );
+//     };    
     
-    options.AddPolicy("GetChecklists", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            GetClientKey(context),
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 30,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
+//     options.AddPolicy("GetChecklists", context =>
+//         RateLimitPartition.GetFixedWindowLimiter(
+//             GetClientKey(context),
+//             _ => new FixedWindowRateLimiterOptions
+//             {
+//                 PermitLimit = 30,
+//                 Window = TimeSpan.FromMinutes(1),
+//                 QueueLimit = 0
+//             }));
 
-    options.AddPolicy("GetAllLoanApplications", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            GetClientKey(context),
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 30,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
+//     options.AddPolicy("GetAllLoanApplications", context =>
+//         RateLimitPartition.GetFixedWindowLimiter(
+//             GetClientKey(context),
+//             _ => new FixedWindowRateLimiterOptions
+//             {
+//                 PermitLimit = 30,
+//                 Window = TimeSpan.FromMinutes(1),
+//                 QueueLimit = 0
+//             }));
 
-    options.AddPolicy("AssessmentSubmit", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            GetClientKey(context),
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
+//     options.AddPolicy("AssessmentSubmit", context =>
+//         RateLimitPartition.GetFixedWindowLimiter(
+//             GetClientKey(context),
+//             _ => new FixedWindowRateLimiterOptions
+//             {
+//                 PermitLimit = 5,
+//                 Window = TimeSpan.FromMinutes(1),
+//                 QueueLimit = 0
+//             }));
 
-    options.AddPolicy("LoanCreate", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            GetClientKey(context),
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 1,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
+//     options.AddPolicy("LoanCreate", context =>
+//         RateLimitPartition.GetFixedWindowLimiter(
+//             GetClientKey(context),
+//             _ => new FixedWindowRateLimiterOptions
+//             {
+//                 PermitLimit = 1,
+//                 Window = TimeSpan.FromMinutes(1),
+//                 QueueLimit = 0
+//             }));
 
-    options.AddPolicy("AiRecommendation", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            GetClientKey(context),
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 2,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
-});
+//     options.AddPolicy("AiRecommendation", context =>
+//         RateLimitPartition.GetFixedWindowLimiter(
+//             GetClientKey(context),
+//             _ => new FixedWindowRateLimiterOptions
+//             {
+//                 PermitLimit = 2,
+//                 Window = TimeSpan.FromMinutes(1),
+//                 QueueLimit = 0
+//             }));
+// });
 
-string GetClientKey(HttpContext context)
-{
-    return context.User.Identity?.IsAuthenticated == true
-        ? context.User.Identity!.Name!
-        : context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
-}
-
+// string GetClientKey(HttpContext context)
+// {
+//     return context.User.Identity?.IsAuthenticated == true
+//         ? context.User.Identity!.Name!
+//         : context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+// }
+builder.Services.AddApiRateLimiting();
 var app = builder.Build();
 PrepDb.PrepPopulation(app, isSQL);
 // Configure the HTTP request pipeline.

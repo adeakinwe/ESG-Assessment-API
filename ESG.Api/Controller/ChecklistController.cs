@@ -1,10 +1,10 @@
 using ESG.Api.DTos;
 using ESG.Api.Interface;
-using ESG.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 namespace ESG.API.Controller
 {
+    [EnableRateLimiting(RateLimitPolicies.Sensitive)]
     [Route("api/checklist")]
     [ApiController]
     public class ChecklistController : ControllerBase
@@ -17,7 +17,7 @@ namespace ESG.API.Controller
         }
 
         [HttpGet("checklist-item")]
-        [EnableRateLimiting("GetChecklists")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public async Task<IActionResult> GetChecklistAsync()
         {
             var data = await _repo.GetChecklistAsync();
@@ -42,6 +42,7 @@ namespace ESG.API.Controller
         }
 
         [HttpGet("loan-application/{loanApplicationId:int}")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public async Task<IActionResult> GetChecklistAssessmentByLoanIdAsync(int loanApplicationId)
         {
             var assessment = await _repo.GetChecklistAssessmentByLoanIdAsync(loanApplicationId);
@@ -55,6 +56,7 @@ namespace ESG.API.Controller
         }
 
         [HttpGet("checklist-summary/{loanApplicationId:int}")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public async Task<IActionResult> GetChecklistAssessmentSummaryByLoanIdAsync(int loanApplicationId)
         {
             var existingSummary = await _repo.GetChecklistAssessmentSummaryByLoanIdAsync(loanApplicationId);

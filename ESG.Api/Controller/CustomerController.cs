@@ -1,9 +1,11 @@
 using ESG.Api.Interface;
 using ESG.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ESG.Api.Controller
 {
+    [EnableRateLimiting(RateLimitPolicies.Sensitive)]
     [Route("api/customer")]
     [ApiController]
     public class CustomerController : ControllerBase
@@ -16,6 +18,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("all")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public ActionResult<List<CustomerForReturnDTO>> GetAllCustomers()
         {
             var customers = _repo.GetAllCustomers();
@@ -29,6 +32,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("{id:int}")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public ActionResult<CustomerForReturnDTO> GetCustomerByCustomerId(int id)
         {
             var customer = _repo.GetCustomerById(id);
@@ -42,6 +46,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpPost("add")]
+        [EnableRateLimiting(RateLimitPolicies.WriteHeavy)]
         public ActionResult<CustomerForReturnDTO> CreateCustomer(CustomerForCreationDTO newCustomer)
         {
             ArgumentNullException.ThrowIfNull(newCustomer);
@@ -56,8 +61,8 @@ namespace ESG.Api.Controller
             return NotFound();
         }
 
-        // GET: api/customers?code=CUST001
         [HttpGet("search")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public ActionResult<IEnumerable<CustomerForReturnDTO>> GetCustomers([FromQuery] string param)
         {
             try

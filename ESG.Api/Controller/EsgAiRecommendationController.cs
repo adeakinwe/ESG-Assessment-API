@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace ESG.Api.Controller
 {
+    [EnableRateLimiting(RateLimitPolicies.Sensitive)]
     [ApiController]
     [Route("api/esg-ai-recommendation")]
     public class EsgAiRecommendationController : ControllerBase

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace ESG.Api.Controller
 {
+    [EnableRateLimiting(RateLimitPolicies.Sensitive)]
     [Route("api/loan-application")]
     [ApiController]
     public class LoanApplicationController : ControllerBase
@@ -17,7 +18,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("all")]
-        [EnableRateLimiting("GetAllLoanApplications")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public ActionResult<List<LoanApplicationForReturnDTO>> GetAllLoanApplication()
         {
             var loanApplications = _repo.GetAllLoanApplication();
@@ -31,6 +32,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("{id:int}")]
+        [EnableRateLimiting(RateLimitPolicies.PublicRead)]
         public ActionResult<LoanApplicationForReturnDTO> GetLoanApplicationById(int id)
         {
             var loanApplication = _repo.GetLoanApplicationById(id);
@@ -44,7 +46,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpPost("add")]
-        [EnableRateLimiting("LoanCreate")]
+        [EnableRateLimiting(RateLimitPolicies.WriteHeavy)]
         public ActionResult<CustomerForReturnDTO> CreateLoanApplication(LoanApplicationForCreationDTO loanApplicaion)
         {
             ArgumentNullException.ThrowIfNull(loanApplicaion);
@@ -60,7 +62,6 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("submit-for-appraisal/{id:int}")]
-        [EnableRateLimiting("AssessmentSubmit")]
         public async Task<IActionResult> SubmitLoanApplicationForAppraisalAsync(int id)
         {
             try
