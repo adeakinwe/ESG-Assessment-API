@@ -1,10 +1,13 @@
-using System.Threading.RateLimiting;
+using System.Text;
 using ESG.Api.Common;
 using ESG.Api.Data;
 using ESG.Api.Interface;
 using ESG.Api.Repository;
 using ESG.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -69,88 +72,53 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Enter JWT token like: {your token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    // Only apply auth to [Authorize] endpoints
+    options.OperationFilter<AuthorizeCheckOperationFilter>();
+});
+
 builder.Services.AddSwaggerGen();
-
-// builder.Services.AddRateLimiter(options =>
-// {
-//     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-//     options.OnRejected = async (context, _) =>
-//     {
-//         var retryAfter = context.Lease.TryGetMetadata(
-//             MetadataName.RetryAfter,
-//             out var retryAfterTime)
-//             ? retryAfterTime
-//             : TimeSpan.FromSeconds(60);
-
-//         var retryAtUtc = DateTimeOffset.UtcNow.Add(retryAfter);
-
-//         context.HttpContext.Response.Headers["Retry-After"] =
-//             retryAtUtc.ToString("R"); // RFC 1123 format
-
-//         await context.HttpContext.Response.WriteAsync(
-//             $"Too many requests. Retry at {retryAtUtc:HH:mm:ss} UTC"
-//         );
-//     };    
-    
-//     options.AddPolicy("GetChecklists", context =>
-//         RateLimitPartition.GetFixedWindowLimiter(
-//             GetClientKey(context),
-//             _ => new FixedWindowRateLimiterOptions
-//             {
-//                 PermitLimit = 30,
-//                 Window = TimeSpan.FromMinutes(1),
-//                 QueueLimit = 0
-//             }));
-
-//     options.AddPolicy("GetAllLoanApplications", context =>
-//         RateLimitPartition.GetFixedWindowLimiter(
-//             GetClientKey(context),
-//             _ => new FixedWindowRateLimiterOptions
-//             {
-//                 PermitLimit = 30,
-//                 Window = TimeSpan.FromMinutes(1),
-//                 QueueLimit = 0
-//             }));
-
-//     options.AddPolicy("AssessmentSubmit", context =>
-//         RateLimitPartition.GetFixedWindowLimiter(
-//             GetClientKey(context),
-//             _ => new FixedWindowRateLimiterOptions
-//             {
-//                 PermitLimit = 5,
-//                 Window = TimeSpan.FromMinutes(1),
-//                 QueueLimit = 0
-//             }));
-
-//     options.AddPolicy("LoanCreate", context =>
-//         RateLimitPartition.GetFixedWindowLimiter(
-//             GetClientKey(context),
-//             _ => new FixedWindowRateLimiterOptions
-//             {
-//                 PermitLimit = 1,
-//                 Window = TimeSpan.FromMinutes(1),
-//                 QueueLimit = 0
-//             }));
-
-//     options.AddPolicy("AiRecommendation", context =>
-//         RateLimitPartition.GetFixedWindowLimiter(
-//             GetClientKey(context),
-//             _ => new FixedWindowRateLimiterOptions
-//             {
-//                 PermitLimit = 2,
-//                 Window = TimeSpan.FromMinutes(1),
-//                 QueueLimit = 0
-//             }));
-// });
-
-// string GetClientKey(HttpContext context)
-// {
-//     return context.User.Identity?.IsAuthenticated == true
-//         ? context.User.Identity!.Name!
-//         : context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
-// }
 builder.Services.AddApiRateLimiting();
+
+// JWT Authentication configuration
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSettings.GetValue<string>("Key");
+if (string.IsNullOrEmpty(jwtKey))
+    throw new InvalidOperationException("Jwt:Key is not configured. Add it in appsettings.json.");
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
+        ValidAudience = jwtSettings.GetValue<string>("Audience"),
+        IssuerSigningKey = key
+    };
+});
+
 var app = builder.Build();
 PrepDb.PrepPopulation(app, isSQL);
 // Configure the HTTP request pipeline.
