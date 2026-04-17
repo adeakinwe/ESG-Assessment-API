@@ -59,6 +59,7 @@ builder.Services.AddScoped<IEsgAiRecommendationService, EsgAiRecommendationServi
 builder.Services.AddScoped<IEsgExplainabilityService, EsgExplainabilityService>();
 builder.Services.AddScoped<IEsgMlFeatureService, EsgMlFeatureService>();
 builder.Services.AddScoped<IEsgMlSignalService, EsgMlSignalService>();
+builder.Services.AddScoped<IAuthRepo, AuthRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

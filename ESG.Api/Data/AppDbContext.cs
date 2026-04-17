@@ -9,6 +9,7 @@ namespace ESG.Api.Data
         {
             
         }
+        public DbSet<USER> USER { get; set; }
         public DbSet<CUSTOMER> CUSTOMER { get; set; }
         public DbSet<ESG_CHECKLIST_ITEM> ESG_CHECKLIST_ITEM { get; set; }
         public DbSet<ESG_CHECKLIST_RESPONSE> ESG_CHECKLIST_RESPONSE { get; set; }
