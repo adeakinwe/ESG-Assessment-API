@@ -7,4 +7,10 @@ namespace ESG.Api.DTOs
         public required string Email { get; set; }
         public required string Password { get; set; }
     }
+
+    public class LoginRequestDTO
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+    }
 }

@@ -15,7 +15,7 @@ namespace ESG.Api.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<AuthResponseDTO> Login(AuthRequestDTO request)
+        public async Task<AuthResponseDTO> Login(LoginRequestDTO request)
         {
             var user = await _dbContext.USER.SingleOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)

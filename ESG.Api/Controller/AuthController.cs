@@ -40,7 +40,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthRequestDTO request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
             if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
                 return BadRequest("Email and Password are required.");
@@ -54,8 +54,8 @@ namespace ESG.Api.Controller
 
             return Ok(new AuthResponseDTO
             {
-                Id = user.Id,
                 FirstName = user.FirstName,
+                LastName = user.LastName,
                 Email = user.Email,
                 Token = token
             });
