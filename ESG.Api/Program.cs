@@ -60,6 +60,7 @@ builder.Services.AddScoped<IEsgExplainabilityService, EsgExplainabilityService>(
 builder.Services.AddScoped<IEsgMlFeatureService, EsgMlFeatureService>();
 builder.Services.AddScoped<IEsgMlSignalService, EsgMlSignalService>();
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

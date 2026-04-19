@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ESG.Api.Data;
 using ESG.Api.DTOs;
 using ESG.Api.Interface;
 using Microsoft.AspNetCore.Mvc;
