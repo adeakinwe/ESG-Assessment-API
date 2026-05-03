@@ -25,7 +25,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("final/{loanApplicationId:int}")]
-        [EnableRateLimiting("AiRecommendation")]
+        [EnableRateLimiting("PublicRead")]
         public async Task<IActionResult> FinalRecommendation(int loanApplicationId)
         {
             var result = await _service.GenerateFinalRecommendationAsync(loanApplicationId);

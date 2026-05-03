@@ -57,8 +57,8 @@ namespace ESG.Api.Common
                         GetClientKey(context),
                         _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 20,
-                            Window = TimeSpan.FromMinutes(1)
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(5)
                         }));
 
                 options.AddPolicy(RateLimitPolicies.WriteHeavy, context =>

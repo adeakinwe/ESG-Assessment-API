@@ -17,6 +17,7 @@ namespace ESG.Api.Controller
         }
 
         [HttpGet("{loanApplicationId}")]
+        [EnableRateLimiting("PublicRead")]
         public async Task<IActionResult> GenerateExplainabilityAsync(int loanApplicationId)
         {
             var result = await _service.GenerateExplainabilityAsync(loanApplicationId);
