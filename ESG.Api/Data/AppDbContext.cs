@@ -7,7 +7,7 @@ namespace ESG.Api.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
+
         }
         public DbSet<USER> USER { get; set; }
         public DbSet<CUSTOMER> CUSTOMER { get; set; }
@@ -18,5 +18,6 @@ namespace ESG.Api.Data
         public DbSet<ESG_CHECKLIST_ASSESSMENT> ESG_CHECKLIST_ASSESSMENT { get; set; }
         public DbSet<ESG_CHECKLIST_SUMMARY> ESG_CHECKLIST_SUMMARY { get; set; }
         public DbSet<APPROVAL_STATUS> APPROVAL_STATUS { get; set; }
-        public DbSet<ESG_AI_RECOMMENDATION> ESG_AI_RECOMMENDATION { get; set; }    }
+        public DbSet<ESG_AI_RECOMMENDATION> ESG_AI_RECOMMENDATION { get; set; }
+    }
 }

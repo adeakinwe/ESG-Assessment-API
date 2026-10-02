@@ -76,7 +76,7 @@ namespace ESG.Api.Repository
                 }
             }
 
-            // 1️⃣ Save individual checklist assessments
+            // Save individual checklist assessments
             var entities = dto.Items.Select(i => new ESG_CHECKLIST_ASSESSMENT
             {
                 CHECKLISTITEMID = i.ChecklistItemId,
@@ -89,7 +89,7 @@ namespace ESG.Api.Repository
 
             _context.ESG_CHECKLIST_ASSESSMENT.AddRange(entities);
 
-            // 2️⃣ Calculate summary
+            // Calculate summary
             double totalScore = dto.Items.Sum(i => i.Score * i.Weight);
             double totalWeight = dto.Items.Sum(i => i.Weight * 10); //weight * max score (10)
             double averageScore = totalWeight > 0 ? Math.Round(totalScore / totalWeight * 100, 2) : 0;
@@ -124,7 +124,7 @@ namespace ESG.Api.Repository
 
             _context.ESG_CHECKLIST_SUMMARY.Add(summary);
 
-            // 3️⃣ Save all changes in one transaction
+            // Save all changes in one transaction
             await _context.SaveChangesAsync();
         }
 
