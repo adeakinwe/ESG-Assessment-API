@@ -7,7 +7,7 @@ namespace ESG.Api.Interface
         List<LoanApplicationForReturnDTO> GetAllLoanApplication();
         LoanApplicationForReturnDTO GetLoanApplicationById(int id);
         string CreateLoanApplication(LoanApplicationForCreationDTO model);
-        bool UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication);
+        Task<bool> UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication, int id);
         bool DeleteLoanApplication(int id);
         bool SaveChanges();
         Task<bool> SubmitLoanApplicationForAppraisalAsync(int id);

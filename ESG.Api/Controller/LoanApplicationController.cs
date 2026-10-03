@@ -61,6 +61,29 @@ namespace ESG.Api.Controller
             return NotFound(new { status = false, message = "Loan Application not added. Kindly contact Admin" });
         }
 
+        [HttpPut("update/{id:int}")]
+        [EnableRateLimiting(RateLimitPolicies.WriteHeavy)]
+        public async Task<ActionResult<bool>> UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication, int id)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(loanApplication);
+
+                bool updated = await _repo.UpdateLoanApplication(loanApplication, id);
+
+                if (updated)
+                {
+                    return Ok(new {status = true, message = "Loan Application updated successfully."});
+                }
+
+                return NotFound(new {status = false, message = "Loan application not updated. Kindly contact admin"});
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex}");
+            }
+        }
+
         [HttpGet("submit-for-appraisal/{id:int}")]
         public async Task<IActionResult> SubmitLoanApplicationForAppraisalAsync(int id)
         {

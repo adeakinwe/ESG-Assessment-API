@@ -134,9 +134,32 @@ namespace ESG.Api.Repository
             return _context.SaveChanges() >= 0;
         }
 
-        public bool UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication)
+        public async Task<bool> UpdateLoanApplication(LoanApplicationForCreationDTO loanApplication, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ArgumentNullException.ThrowIfNull(loanApplication);
+                var loanAppl = await _context.LOAN_APPLICATION.Where(l => l.LOANAPPLICATIONID == id).FirstOrDefaultAsync();
+
+                if (loanAppl != null)
+                {
+                    loanAppl.PRODUCTID = loanApplication.productId;
+                    loanAppl.AMOUNT = loanApplication.amount;
+                    loanAppl.TENOR = loanApplication.tenorInDays;
+                    loanAppl.INTERESTRATE = loanApplication.interestRate;
+                    loanAppl.LOANPURPOSE = loanApplication.loanPurpose;
+                    loanAppl.CURRENCYID = loanApplication.currencyId;
+                    loanAppl.DATETIMECREATED = DateTime.Now;
+
+                    return SaveChanges();
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Exception: {ex}");
+            }
         }
 
         public async Task<bool> SubmitLoanApplicationForAppraisalAsync(int id)
