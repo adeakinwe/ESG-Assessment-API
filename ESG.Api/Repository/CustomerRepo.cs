@@ -42,7 +42,7 @@ namespace ESG.Api.Repository
                 address = x.ADDRESS
             }).ToList();
 
-            return customers;
+            return customers ?? new List<CustomerForReturnDTO>();
         }
 
         public CustomerForReturnDTO GetCustomerById(int id)

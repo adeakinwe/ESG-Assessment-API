@@ -35,7 +35,7 @@ namespace ESG.Api.Repository
 
             if (saved)
             {
-                newLoanApplication.APPLREFERENCENUMBER = GenerateReference(newLoanApplication);
+                newLoanApplication.APPLREFERENCENUMBER = GenerateReference(newLoanApplication.APPLICATIONDATE, newLoanApplication.LOANAPPLICATIONID);
                 SaveChanges();
                 
                 return newLoanApplication.APPLREFERENCENUMBER;
@@ -44,9 +44,9 @@ namespace ESG.Api.Repository
             return string.Empty;
         }
 
-        private string GenerateReference(LOAN_APPLICATION loan)
+        private string GenerateReference(DateTime date, int loanApplicationId)
         {
-            return $"GLN-{loan.APPLICATIONDATE:yyyyMMdd}-{loan.LOANAPPLICATIONID:D6}";
+            return $"GLN-{date:yyyyMMdd}-{loanApplicationId:D6}";
         }
 
         public bool DeleteLoanApplication(int id)
